@@ -28,7 +28,7 @@ namespace RemGame
         public SoundManager(Game game)
             : base(game)
         {
-            game.Services.AddService(typeof(ISoundManager), this);
+           game.Services.AddService(typeof(ISoundManager), this);
         }
 
         public override void Initialize()
@@ -38,15 +38,18 @@ namespace RemGame
 
         public void LoadContent(string musicPath, string fxPath)
         {
+            
             songs = Directory.EnumerateFiles(Path.Combine(Game.Content.RootDirectory, musicPath))
                 .Where(f => Path.GetExtension(f).Equals(".xnb"))
                 .Select(f => Path.GetFileNameWithoutExtension(f))
                 .ToDictionary(f => f, f => Game.Content.Load<Song>(Path.Combine(musicPath, f)));
-
+         
+            
             soundEffects = Directory.EnumerateFiles(Path.Combine(Game.Content.RootDirectory, fxPath))
                 .Where(f => Path.GetExtension(f).Equals(".xnb"))
                 .Select(f => Path.GetFileNameWithoutExtension(f))
                 .ToDictionary(f => f, f => Game.Content.Load<SoundEffect>(Path.Combine(fxPath, f)));
+                
         }
 
 
@@ -85,24 +88,27 @@ namespace RemGame
             {
                 song.Dispose();
             }
-
+            
             foreach (SoundEffectInstance soundEffectInstance in playingInstances)
             {
                 soundEffectInstance.Stop();
                 soundEffectInstance.Dispose();
             }
-
+            
+            
             foreach (SoundEffect soundEffect in soundEffects.Values)
             {
                 soundEffect.Dispose();
             }
+            
 
             playList = null;
             songs = null;
-            soundEffects = null;
+            //soundEffects = null;
             playingInstances = null;
 
             base.Dispose(disposing);
+            
         }
 
         public bool IsSongPlaying(string soundName)
@@ -129,6 +135,7 @@ namespace RemGame
             return false;
         }
         */
+        
         public void Play(string soundName)
         {
             switch (GetSoundType(soundName))
@@ -215,10 +222,11 @@ namespace RemGame
         private SoundType GetSoundType(string soundName)
         {
             if (songs.ContainsKey(soundName))
-                return SoundType.Song;
+              return SoundType.Song;
             else if (soundEffects.ContainsKey(soundName))
-                return SoundType.SoundEffect;
-            else return SoundType.None;
+              return SoundType.SoundEffect;
+            else 
+            return SoundType.None;
         }
     }
 }

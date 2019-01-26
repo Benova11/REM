@@ -41,9 +41,16 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BaseGameState.cs" />
+    <Compile Include="GameStateInterfaces.cs" />
     <Compile Include="LevelDesgin\Map.cs" />
     <Compile Include="LevelDesgin\ScrollingBackground.cs" />
     <Compile Include="LevelDesgin\Tile.cs" />
+    <Compile Include="OptionsMenuState.cs" />
+    <Compile Include="PausedState.cs" />
+    <Compile Include="PlayingStateOrg.cs" />
+    <Compile Include="StartMenuState.cs" />
+    <Compile Include="TitleIntroState.cs" />
     <Compile Include="Utils\AnimatedSprite.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="Component.cs" />
@@ -81,6 +88,8 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.manifest" />
     <None Include="Content\Buttons\Button.xnb" />
+    <None Include="Content\Fonts\Arial.xnb" />
+    <None Include="Content\Fonts\ArialSmall.xnb" />
     <None Include="Content\Fonts\Font.xnb" />
     <None Include="Content\Layers\b-01_background.xnb" />
     <None Include="Content\Layers\b-02_back-A.xnb" />
@@ -88,11 +97,25 @@
     <None Include="Content\Layers\b-04_ground.xnb" />
     <None Include="Content\Layers\f-01_ground-grass.xnb" />
     <None Include="Content\Layers\f-02_front.xnb" />
+    <None Include="Content\Sound\Music\General Music 1.xnb" />
+    <None Include="Content\Sound\SoundFX\Footsteps Brick 1.xnb" />
+    <None Include="Content\Sound\SoundFX\Jump.xnb" />
+    <None Include="Content\Texture\cave_walk.xnb" />
+    <None Include="Content\Texture\optionsMenu.xnb" />
+    <None Include="Content\Texture\pause.xnb" />
+    <None Include="Content\Texture\snow_bg.xnb" />
+    <None Include="Content\Texture\sonic.xnb" />
+    <None Include="Content\Texture\startMenu.xnb" />
+    <None Include="Content\Texture\titleIntro.xnb" />
     <None Include="Content\Tiles\tile1.xnb" />
     <None Include="Content\Tiles\tile2.xnb" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5\XELibrary\XELibrary.csproj">
+      <Project>{623010cd-3e24-4f0e-9eae-922dad230975}</Project>
+      <Name>XELibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Farseer\Farseer.csproj">
       <Project>{0b03b2d6-bcdb-4e07-aafa-4ef84ea6a31b}</Project>
       <Name>Farseer</Name>

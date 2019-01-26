@@ -13,6 +13,122 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../../../../../../../Desktop/originalGame1/Sound/Music/General Music 1.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:../../../../../../../Desktop/originalGame1/Sound/Music/General Music 1.mp3;Sound/Music/General Music 1.mp3
+
+#begin ../../../../../../../Desktop/originalGame1/Sound/SoundFX/Footsteps Brick 1.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:../../../../../../../Desktop/originalGame1/Sound/SoundFX/Footsteps Brick 1.mp3;Sound/SoundFX/Footsteps Brick 1.mp3
+
+#begin ../../../../../../../Desktop/originalGame1/Sound/SoundFX/Jump.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:../../../../../../../Desktop/originalGame1/Sound/SoundFX/Jump.mp3;Sound/SoundFX/Jump.mp3
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Fonts/Arial.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Fonts/Arial.spritefont;Fonts/Arial.spritefont
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Fonts/ArialSmall.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Fonts/ArialSmall.spritefont;Fonts/ArialSmall.spritefont
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/cave_walk.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/cave_walk.png;Textures/cave_walk.png
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/optionsMenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/optionsMenu.png;Textures/optionsMenu.png
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/pause.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/pause.png;Textures/pause.png
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/snow_bg.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/snow_bg.png;Textures/snow_bg.png
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/sonic.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/sonic.png;Textures/sonic.png
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/startMenu.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/startMenu.png;Textures/startMenu.png
+
+#begin ../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/titleIntro.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/titleIntro.jpg;Textures/titleIntro.jpg
+
 #begin Buttons/Button.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -187,24 +303,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Player/Ron_standing.png
-
-#begin Sound/Music/General Music 1.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:Sound/Music/General Music 1.mp3
-
-#begin Sound/SoundFX/Footsteps Brick 1.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sound/SoundFX/Footsteps Brick 1.mp3
-
-#begin Sound/SoundFX/Jump.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Sound/SoundFX/Jump.mp3
 
 #begin Tiles/tile1.png
 /importer:TextureImporter

@@ -117,8 +117,9 @@ namespace RemGame
         public void DrawEnemies(GameTime gameTime, SpriteBatch spriteBatch)
         {
            
-
+            
             foreach (Enemy en in enemies)
+          
                 en.Draw(gameTime, spriteBatch);
         }
 

@@ -4,31 +4,49 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Buttons/Button.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/cave_walk.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Fonts/Font.spritefont</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/HUD.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/b-01_background.jpg</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/b-02_back-A.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/b-03_back-B.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/b-04_ground.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/f-01_ground-grass.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/f-02_front.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/player.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/bullet.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/playerLeft.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/playerRight.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/Ron_standing.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Sound/Music/General Music 1.mp3</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Sound/SoundFX/Footsteps Brick 1.mp3</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Sound/SoundFX/Jump.mp3</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Tiles/tile1.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Tiles/tile2.jpg</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../../Desktop/originalGame1/Sound/Music/General Music 1.mp3</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../../Desktop/originalGame1/Sound/SoundFX/Footsteps Brick 1.mp3</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../../Desktop/originalGame1/Sound/SoundFX/Jump.mp3</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Fonts/Arial.spritefont</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Fonts/ArialSmall.spritefont</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/cave_walk.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/optionsMenu.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/pause.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/snow_bg.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/sonic.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/startMenu.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/../../../../../../vgd2018-60175f520db450fa2eb28373a8a26b5d8beaf5d5/PS7/Content/Textures/titleIntro.jpg</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Buttons/Button.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/cave_walk.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Fonts/Font.spritefont</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/HUD.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Layers/b-01_background.jpg</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Layers/b-02_back-A.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Layers/b-03_back-B.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Layers/b-04_ground.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Layers/f-01_ground-grass.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Layers/f-02_front.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/player.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Player/bullet.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Player/playerLeft.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Player/playerRight.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Player/Ron_standing.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Tiles/tile1.png</File>
+    <File>C:/Users/danie/OneDrive/מסמכים/Visual Studio 2013/Projects/REM/RemGame/Content/Tiles/tile2.jpg</File>
   </SourceFiles>
   <DestFiles>
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
-    <File xsi:nil="true" />
+    <File>Sound/Music/General Music 1.mp3</File>
+    <File>Sound/SoundFX/Footsteps Brick 1.mp3</File>
+    <File>Sound/SoundFX/Jump.mp3</File>
+    <File>Fonts/Arial.spritefont</File>
+    <File>Fonts/ArialSmall.spritefont</File>
+    <File>Textures/cave_walk.png</File>
+    <File>Textures/optionsMenu.png</File>
+    <File>Textures/pause.png</File>
+    <File>Textures/snow_bg.png</File>
+    <File>Textures/sonic.png</File>
+    <File>Textures/startMenu.png</File>
+    <File>Textures/titleIntro.jpg</File>
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

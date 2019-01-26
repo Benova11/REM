@@ -279,6 +279,7 @@ namespace RemGame
 
         public void Kinesis(Obstacle obj,MouseState currentMouseState)
         {
+            Console.WriteLine("ASASDdafadgadgdagdagdagadgadgdagadgadgadgadgadgadgdagdagdagdagdagad");
             obj.KinesisOn = true;
 
             if (obj.Position.Y > 0 )

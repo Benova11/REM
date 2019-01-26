@@ -298,8 +298,8 @@ namespace RemGame
    
             if (position.X < 1000)
             {
-                Console.WriteLine(lastPosition);
-                Console.WriteLine("pos:" + Position);
+                //Console.WriteLine(lastPosition);
+                //Console.WriteLine("pos:" + Position);
             }
             //if ((DateTime.Now - previousWalk).TotalSeconds >= walkInterval)
             //{
