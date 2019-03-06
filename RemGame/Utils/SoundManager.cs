@@ -136,6 +136,9 @@ namespace RemGame
                 case SoundType.Song:
                     MediaPlayer.Volume = 0.2f;
                     MediaPlayer.Play(songs[soundName]);
+                    ////////////////////////////////////////////////////////////CHECKLOOP/////////////////////////
+                    MediaPlayer.IsRepeating = true;
+                    ///////////////////////////////////////////////////////////
                     break;
                 case SoundType.SoundEffect:
                     SoundEffectInstance effectInstance = soundEffects[soundName].CreateInstance();

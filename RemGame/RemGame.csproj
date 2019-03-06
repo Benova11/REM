@@ -41,17 +41,17 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="BaseGameState.cs" />
+    <Compile Include="States\BaseGameState.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="GameStateInterfaces.cs" />
+    <Compile Include="States\GameStateInterfaces.cs" />
     <Compile Include="LevelDesgin\Map.cs" />
     <Compile Include="LevelDesgin\ScrollingBackground.cs" />
     <Compile Include="LevelDesgin\Tile.cs" />
-    <Compile Include="OptionsMenuState.cs" />
-    <Compile Include="PausedState.cs" />
-    <Compile Include="PlayingStateOrg.cs" />
-    <Compile Include="StartMenuState.cs" />
-    <Compile Include="TitleIntroState.cs" />
+    <Compile Include="States\OptionsMenuState.cs" />
+    <Compile Include="States\PausedState.cs" />
+    <Compile Include="States\PlayingStateOrg.cs" />
+    <Compile Include="States\StartMenuState.cs" />
+    <Compile Include="States\TitleIntroState.cs" />
     <Compile Include="Utils\AnimatedSprite.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="Component.cs" />
@@ -87,16 +87,6 @@
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />
     <None Include="app.manifest" />
-    <None Include="Content\Buttons\Button.xnb" />
-    <None Include="Content\Fonts\Font.xnb" />
-    <None Include="Content\Layers\b-01_background.xnb" />
-    <None Include="Content\Layers\b-02_back-A.xnb" />
-    <None Include="Content\Layers\b-03_back-B.xnb" />
-    <None Include="Content\Layers\b-04_ground.xnb" />
-    <None Include="Content\Layers\f-01_ground-grass.xnb" />
-    <None Include="Content\Layers\f-02_front.xnb" />
-    <None Include="Content\Tiles\tile1.xnb" />
-    <None Include="Content\Tiles\tile2.xnb" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

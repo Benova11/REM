@@ -21,6 +21,7 @@ namespace RemGame
         bool pingPong = false;
         bool Ghost = false;
         /// </summary>
+        private int health = 5;
         private World world;
         private Texture2D texture;
         private Vector2 size;
@@ -32,6 +33,9 @@ namespace RemGame
 
         private PhysicsObject torso;
         private PhysicsObject wheel;
+
+        private PhysicsObject mele;
+
 
         private DateTime previousWalk = DateTime.Now;   // time at which we previously jumped
         private const float walkInterval = 3.0f;        // in seconds
@@ -53,15 +57,17 @@ namespace RemGame
         private PhysicsView pv2;
 
         private bool isAttacking = false;
+        private bool isMeleAttacking = false;
         private RevoluteJoint axis1;
 
-
+        private bool isPlayerAlive = true;
         
-        private const float SPEED = 0.5f;
+        private const float SPEED = 0.3f;
         private float speed = SPEED;
         private bool isMoving = false;
         private bool isBackToLastPos = true;
         private Movement direction = Movement.Right;
+        private bool lookingRight = true;
 
 
 
@@ -85,8 +91,11 @@ namespace RemGame
         MouseState currentMouseState;
         MouseState previousMouseState = Mouse.GetState();
 
+        Texture2D shootTexture;
 
-        
+        private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
+        private const float shootInterval = 1.5f;
+
 
         public Enemy(World world, Texture2D torsoTexture, Texture2D wheelTexture, Texture2D bullet, Vector2 size, float mass, Vector2 startPosition, bool isBent, SpriteFont f,int newDistance)
         {
@@ -115,6 +124,8 @@ namespace RemGame
 
             oldDistance = distance;
 
+
+            shootTexture = bullet;
             // Create the feet of the body
             wheel = new PhysicsObject(world, torsoTexture, wheelSize, mass / 2.0f);
             wheel.Position = torso.Position + new Vector2(0, torsoSize.X / 2);
@@ -139,11 +150,18 @@ namespace RemGame
             pv1 = new PhysicsView(torso.Body, torso.Position, torso.Size, f);
             pv2 = new PhysicsView(wheel.Body, wheel.Position, wheel.Size, f);
 
-            torso.Body.CollisionCategories = Category.Cat10;
-            wheel.Body.CollisionCategories = Category.Cat11;
+            torso.Body.CollisionCategories = Category.Cat20;
+            wheel.Body.CollisionCategories = Category.Cat21;
 
-            torso.Body.CollidesWith = Category.Cat1;
-            wheel.Body.CollidesWith = Category.Cat1;
+            
+
+            torso.Body.CollidesWith = Category.Cat1 | Category.Cat28;
+            wheel.Body.CollidesWith = Category.Cat1 | Category.Cat28;
+
+
+            torso.Body.OnCollision += new OnCollisionEventHandler(HitByPlayer);
+            wheel.Body.OnCollision += new OnCollisionEventHandler(HitByPlayer);
+
 
         }
 
@@ -159,11 +177,12 @@ namespace RemGame
             switch (movement)
             {
                 case Movement.Left:
-                    if (!keyboardState.IsKeyDown(Keys.LeftShift))
-                        axis1.MotorSpeed = -MathHelper.TwoPi * speed;
+                    lookingRight = false;
+                     axis1.MotorSpeed = -MathHelper.TwoPi * speed;
                     break;
 
                 case Movement.Right:
+                    lookingRight = true;
                     axis1.MotorSpeed = MathHelper.TwoPi * speed;
                     break;
 
@@ -211,11 +230,70 @@ namespace RemGame
 
         public void meleAttack()
         {
-            IsAttacking = true;
-           // mele.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y + torso.Size.Y / 2);
-            //mele.Body.ApplyLinearImpulse(new Vector2(4, 0));
-            //mele.Body.FixtureList[0].OnCollision = dispose;
-            // IsAttacking = false;
+            if ((DateTime.Now - previousShoot).TotalSeconds >= shootInterval && !Ghost)
+            {
+                isMeleAttacking = true;
+                mele = new PhysicsObject(world, shootTexture, 30, 1);
+                mele.Body.CollisionCategories = Category.Cat30;
+                mele.Body.CollidesWith = Category.Cat10 | Category.Cat11 | Category.Cat1;
+                
+                //mele.Body.CollidesWith = Category.Cat1;
+
+                mele.Body.Mass = 4.0f;
+                mele.Body.IgnoreGravity = true;
+                mele.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y + torso.Size.Y / 2);
+                int dir;
+                if (lookingRight)
+                    dir = 1;
+                else
+                    dir = -1;
+                mele.Body.ApplyLinearImpulse(new Vector2(30*dir, 0));
+                //mele.Body.FixtureList[0].OnCollision = dispose;
+                if (isPlayerAlive)
+                    mele.Body.OnCollision += new OnCollisionEventHandler(Mele_OnCollision);
+                previousShoot = DateTime.Now;
+
+            }
+            else
+            isAttacking = false;
+            
+        }
+
+        bool Mele_OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
+        {
+            
+            Console.WriteLine("Mele_OnCollision");
+
+            isMeleAttacking = false;
+            //mele.Body.Enabled = false;
+            mele.Body.Dispose();
+            return true;
+        
+
+        }
+        
+        bool HitByPlayer(Fixture fixtureA, Fixture fixtureB, Contact contact)
+        {
+                if (fixtureB.CollisionCategories == Category.Cat28)
+                {
+                    if (health > 0)
+                    {
+                        health--;
+                        Console.WriteLine(health);
+                    }
+                    else
+                    {
+                        //torso.Body.Enabled = false;
+                        //wheel.Body.Enabled = false;
+                        torso.Body.Dispose();
+                        wheel.Body.Dispose();
+
+                    }
+                    return true;
+                }
+            
+            return true;
+
         }
 
         public void Kinesis(Obstacle obj, MouseState currentMouseState)
@@ -261,9 +339,12 @@ namespace RemGame
             torso.Position = wheel.Position;
         }
 
-        public void Update(GameTime gameTime, Vector2 playerPosition)
-        {
 
+
+        public void Update(GameTime gameTime,Vector2 playerPosition, bool PlayerAlive)
+        {
+            if (!PlayerAlive)
+                isPlayerAlive = false;
             keyboardState = Keyboard.GetState();
             currentMouseState = Mouse.GetState();
 
@@ -275,6 +356,7 @@ namespace RemGame
                 Anim.Update(gameTime);
             else //player will appear as standing with frame [1] from the atlas.
                 Anim.CurrentFrame = 1;
+
 
             isMoving = false;
             if (keyboardState.IsKeyDown(Keys.Q) && !(prevKeyboardState.IsKeyDown(Keys.Q)))
@@ -295,156 +377,112 @@ namespace RemGame
                 }
 
             }
-   
-            if (position.X < 1000)
-            {
-                Console.WriteLine(lastPosition);
-                Console.WriteLine("pos:" + Position);
-            }
-            //if ((DateTime.Now - previousWalk).TotalSeconds >= walkInterval)
-            //{
-            
-            if (playerPosition.X > Position.X - 150 && playerPosition.X < Position.X + 150)
-            {
-                speed = SPEED;
-                isBackToLastPos = false;
-                if (playerPosition.X < Position.X)
-                {
-                    Move(Movement.Left);
-                    isMoving = true;
-                    direction = Movement.Left;
-                }
-                else
-                {
-                    Move(Movement.Right);
-                    isMoving = true;
-                    direction = Movement.Right;
-                }
-            }
-            else if (!isBackToLastPos)
-            {
-                speed = 0.2f;
-                if (lastPosition.X+4 < Position.X)
-                {
-                   
-                    Move(Movement.Left);
-                    isMoving = true;
-                    direction = Movement.Left;
-                }
-                else if (lastPosition.X-4 > Position.X)
-                {
-                    Move(Movement.Right);
-                    isMoving = true;
-                    direction = Movement.Right;
-                }
-                else
-                {
-                    Move(Movement.Stop);
-                    isBackToLastPos = true;
-                }
-            }
-            else if(isBackToLastPos) {
-                speed = SPEED;
 
-                //torso.Body.OnCollision += OnCollisionEventHandler()             
-                if (!(pingPong) && Position.X <= lastPosition.X + distance - size.X / 2 && !(Ghost))
+            if (!torso.Body.IsDisposed) {
+                if (playerPosition.X > Position.X - 200 && playerPosition.X < Position.X + 200 && isPlayerAlive)
                 {
-                    //Console.WriteLine("RIGHT")
-                    Move(Movement.Right);
-                    isMoving = true;
-                    direction = Movement.Right;
-
-                }
-
-                else if (!(Ghost))
-                {
-                    pingPong = true;
-                    if (pingPong && Position.X >= lastPosition.X + size.X / 2 - distance)
+                    speed = SPEED;
+                    int dir = 0;
+                    isBackToLastPos = false;
+                    if (playerPosition.X < Position.X - 150)
                     {
                         Move(Movement.Left);
                         isMoving = true;
                         direction = Movement.Left;
+                        this.meleAttack();
+
+                    }
+                    else if (playerPosition.X > Position.X + 150)
+                    {
+                        Move(Movement.Right);
+                        isMoving = true;
+                        direction = Movement.Right;
+                        this.meleAttack();
+
+                    }
+
+                    else
+                    {
+                        Move(Movement.Stop);
+                        this.meleAttack();
+                    }
+
+                }
+                else if (!isBackToLastPos)
+                {
+                    speed = 0.2f;
+                    if (lastPosition.X + 4 < Position.X)
+                    {
+
+                        Move(Movement.Left);
+                        isMoving = true;
+                        direction = Movement.Left;
+                    }
+                    else if (lastPosition.X - 4 > Position.X)
+                    {
+                        Move(Movement.Right);
+                        isMoving = true;
+                        direction = Movement.Right;
                     }
                     else
-                        pingPong = false;
+                    {
+                        Move(Movement.Stop);
+                        isBackToLastPos = true;
+                    }
+                }
+                else if (isBackToLastPos)
+                {
 
+                    speed = SPEED;
+
+                    //torso.Body.OnCollision += OnCollisionEventHandler()             
+                    if (!(pingPong) && Position.X <= lastPosition.X + distance - size.X / 2 && !(Ghost))
+                    {
+                        //Console.WriteLine("RIGHT")
+                        Move(Movement.Right);
+                        isMoving = true;
+                        direction = Movement.Right;
+
+                    }
+
+                    else if (!(Ghost))
+                    {
+                        pingPong = true;
+                        if (pingPong && Position.X >= lastPosition.X + size.X / 2 - distance)
+                        {
+                            Move(Movement.Left);
+                            isMoving = true;
+                            direction = Movement.Left;
+                        }
+                        else
+                            pingPong = false;
+
+                    }
+
+
+
+                    else
+                    {
+                        Move(Movement.Stop);
+                    }
                 }
             }
-                previousWalk = DateTime.Now;
-
-                //}
             
-        
-           
-                /*
-                else
-                {
-                    Move(Movement.Stop);
-                    isMoving = false;
-
-                }
-                */
-                /* 
-                                     
-
-                                    //if statment should changed
-                                    if (keyboardState.IsKeyDown(Keys.Space) && !(prevKeyboardState.IsKeyDown(Keys.Space)))
-                                    {
-                                        isMoving = true;
-                                        Jump();
-                                    }
-
-                                    if (keyboardState.IsKeyDown(Keys.LeftShift) && !(prevKeyboardState.IsKeyDown(Keys.LeftShift)))
-                                    {
-
-                                        if (keyboardState.IsKeyDown(Keys.Right))
-                                            Slide(Movement.Right);
-
-                                        else if (keyboardState.IsKeyDown(Keys.Left))
-                                            Slide(Movement.Left);
-
-                                    }
-
-
-                                    if (currentMouseState.LeftButton == ButtonState.Pressed && !(previousMouseState.LeftButton == ButtonState.Pressed))
-                                    {
-                                        shootDirection = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
-                                        Console.WriteLine("start: " + currentMouseState.Position.X + " " + currentMouseState.Position.Y);
-
-                                    }
-                                    if (currentMouseState.LeftButton == ButtonState.Released && (previousMouseState.LeftButton == ButtonState.Pressed))
-                                    {
-                                        //IsAttacking = true;
-                                        shootBase = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
-                                        Console.WriteLine("end: " + currentMouseState.Position.X + " " + currentMouseState.Position.Y);
-                                        Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X) / 4, (shootDirection.Y - shootBase.Y) / 4);
-                                        shoot.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y + torso.Size.Y / 2);
-                                        shoot.Body.ApplyForce(shootForce);
-
-                                    }
-
-                                    if (keyboardState.IsKeyDown(Keys.LeftControl) && !(prevKeyboardState.IsKeyDown(Keys.LeftControl)))
-                                    {
-                                        meleAttack();
-
-                                    }
-
-
-                                    if (keyboardState.IsKeyDown(Keys.Down))
-                                    {
-                                        bent();
-                                    }
-               */
-                /*
+            
+                //}
+            /*
                 if (keyboardState.IsKeyUp(Keys.Down)&& prevKeyboardState.IsKeyDown(Keys.Down))
                 {
                     //torso.Body.Enabled = true;
 
                 }
                 */
-                //mele.Update(gameTime);
+                if(isMeleAttacking)
+                mele.Update(gameTime);
+                
+                if(!isPlayerAlive)
 
-                previousMouseState = currentMouseState;
+            previousMouseState = currentMouseState;
             prevKeyboardState = keyboardState;
 
         }
@@ -459,16 +497,16 @@ namespace RemGame
             Rectangle dest = torso.physicsObjRecToDraw();
             //dest.Height = dest.Height+(int)wheel.Size.Y/2;
             //dest.Y = dest.Y + (int)wheel.Size.Y/2;
-
+            if(!torso.Body.IsDisposed)
             anim.Draw(spriteBatch, dest, torso.Body);
-            pv1.Draw(gameTime, spriteBatch);
-            pv2.Draw(gameTime, spriteBatch);
-            /*
-                        if (isAttacking)
-                            mele.Draw(gameTime, spriteBatch);
+            //pv1.Draw(gameTime, spriteBatch);
+            //pv2.Draw(gameTime, spriteBatch);
 
-                            shoot.Draw(gameTime, spriteBatch);
-            */
+            if (isMeleAttacking && !(mele.Body.IsDisposed))
+                mele.Draw(gameTime, spriteBatch);
+
+
+
 
 
 
