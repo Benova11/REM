@@ -14,13 +14,22 @@
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/f-01_ground-grss.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/f-02_front.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/level.jpg</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/level/row-1-col-1.jpeg</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/level/row-1-col-2.jpeg</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/level/row-1-col-3.jpeg</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/level/row-1-col-4.jpeg</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Layers/level/row-1-col-5.jpeg</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/misc/heart.png</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/Anim/Ron_Crouch_Walk.png</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/Anim/Ron_Stand.png</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/Anim/Ron_Walk.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/bullet.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/playerLeft.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/playerRight.png</File>
-    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Player/Ron_standing.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/ScreenDisplay/cave_walk.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/ScreenDisplay/optionsMenu.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/ScreenDisplay/pause.png</File>
+    <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/ScreenDisplay/resumeOResc.jpg</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/ScreenDisplay/startMenu.png</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/ScreenDisplay/titleIntro.jpg</File>
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Sound/FX/Footsteps Brick 1.mp3</File>
@@ -32,6 +41,15 @@
     <File>C:/Users/ben11/source/repos/RemGame/RemGame/Content/Tiles/tile2.jpg</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

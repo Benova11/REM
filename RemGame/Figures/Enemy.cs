@@ -17,6 +17,7 @@ namespace RemGame
 {
     class Enemy 
     {
+        Random random;
         /// <summary>
         bool pingPong = false;
         bool Ghost = false;
@@ -79,7 +80,8 @@ namespace RemGame
         private const float slideInterval = 0.1f;        // in seconds
         private Vector2 slideForce = new Vector2(4, 0); // applied force when jumping
 
-
+        private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
+        private const float shootInterval = 3.0f;        // in seconds
 
         private AnimatedSprite anim;
         private AnimatedSprite[] animations = new AnimatedSprite[2];
@@ -92,9 +94,6 @@ namespace RemGame
         MouseState previousMouseState = Mouse.GetState();
 
         Texture2D shootTexture;
-
-        private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
-        private const float shootInterval = 1.5f;
 
 
         public Enemy(World world, Texture2D torsoTexture, Texture2D wheelTexture, Texture2D bullet, Vector2 size, float mass, Vector2 startPosition, bool isBent, SpriteFont f,int newDistance)
@@ -121,9 +120,7 @@ namespace RemGame
 
             distance = rInt;
             
-
             oldDistance = distance;
-
 
             shootTexture = bullet;
             // Create the feet of the body
@@ -227,10 +224,15 @@ namespace RemGame
 
         public void meleAttack()
         {
-            if ((DateTime.Now - previousShoot).TotalSeconds >= shootInterval && !Ghost)
+            random = new Random();
+            double randomInterval = (random.NextDouble() * shootInterval + 1);
+            
+
+            Console.WriteLine(randomInterval);
+            if ((DateTime.Now - previousShoot).TotalSeconds >= randomInterval && !Ghost)
             {
                 isMeleAttacking = true;
-                mele = new PhysicsObject(world, shootTexture, 30, 1);
+                mele = new PhysicsObject(world, shootTexture, 15, 1);
                 mele.Body.CollisionCategories = Category.Cat30;
                 mele.Body.CollidesWith = Category.Cat10 | Category.Cat11 | Category.Cat1;
                 
@@ -238,7 +240,7 @@ namespace RemGame
 
                 mele.Body.Mass = 1.0f;
                 mele.Body.IgnoreGravity = true;
-                mele.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y + torso.Size.Y / 2);
+                mele.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y);
                 int dir;
                 if (lookingRight)
                     dir = 1;
@@ -501,11 +503,6 @@ namespace RemGame
 
             if (isMeleAttacking && !(mele.Body.IsDisposed))
                 mele.Draw(gameTime, spriteBatch);
-
-
-
-
-
 
             //wheel.Draw(gameTime,spriteBatch);
         }

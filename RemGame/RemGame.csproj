@@ -44,10 +44,12 @@
     <Compile Include="Figures\Shot.cs" />
     <Compile Include="States\BaseGameState.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="States\EscapeState.cs" />
     <Compile Include="States\GameStateInterfaces.cs" />
     <Compile Include="LevelDesgin\Map.cs" />
     <Compile Include="LevelDesgin\ScrollingBackground.cs" />
     <Compile Include="LevelDesgin\Tile.cs" />
+    <Compile Include="States\Mission1.cs" />
     <Compile Include="States\OptionsMenuState.cs" />
     <Compile Include="States\PausedState.cs" />
     <Compile Include="States\PlayingStateOrg.cs" />

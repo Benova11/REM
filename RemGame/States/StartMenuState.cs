@@ -8,12 +8,13 @@ namespace RemGame
     public sealed class StartMenuState : BaseGameState, IStartMenuState
     {
         private Texture2D texture;
-        
+
         private SpriteFont font;
         private int selected;
-        private string[] entries = 
+        private string[] entries =
         {
-            "Play",
+            "Tutorial",
+            "Mission1",
             "Options",
             "Exit Game"
         };
@@ -21,8 +22,8 @@ namespace RemGame
         public StartMenuState(Game game)
             : base(game)
         {
-            game.Services.AddService(typeof(IStartMenuState), this);
-
+            if (game.Services.GetService(typeof(IStartMenuState)) == null)
+                game.Services.AddService(typeof(IStartMenuState), this);
             selected = 0;
         }
 
@@ -33,6 +34,7 @@ namespace RemGame
                 // Go back to title screen
                 StateManager.ChangeState(OurGame.TitleIntroState.Value);
             }
+
 
             if (Input.KeyboardHandler.WasKeyPressed(Keys.Up))
                 selected--;
@@ -54,11 +56,23 @@ namespace RemGame
                             StateManager.PopState();
                         else // Starting a new game.
                             StateManager.ChangeState(OurGame.PlayingState.Value);
+
                         break;
                     case 1:
+                        // Got back here from playing the game. So just pop myself off the stack
+                        if (StateManager.ContainsState(OurGame.Mission1.Value))
+                            StateManager.PopState();
+                        else // Starting a new game.
+                        {
+                            
+                            StateManager.ChangeState(OurGame.Mission1.Value);
+                        }
+                        break;
+                
+                    case 2:
                         StateManager.PushState(OurGame.OptionsMenuState.Value);
                         break;
-                    case 2:
+                    case 3:
                         StateManager.ChangeState(OurGame.TitleIntroState.Value);
                         break;
                 }
@@ -80,7 +94,7 @@ namespace RemGame
             Vector2 origin = new Vector2(texture.Width / 2,
                                          texture.Height / 2);
             Vector2 currPos = new Vector2(100, pos.Y / 2);
-            
+
             OurGame.SpriteBatch.Draw(texture, pos, new Rectangle(0, 0, texture.Width, texture.Height), Color.White, 0.0f, origin, new Vector2(1.0f, 1.0f), SpriteEffects.None, 0.0f);
             for (int i = 0; i < entries.Length; i++)
             {

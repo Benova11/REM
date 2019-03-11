@@ -48,6 +48,7 @@ namespace RemGame
         Vector2 shootBase;
         Vector2 shootDirection;
         Texture2D shootTexture;
+        Texture2D hearts;
         /// <tmp>
         /// 
         private bool isMeleAttacking = false;
@@ -59,7 +60,7 @@ namespace RemGame
 
         private int health = 8;
         private bool isAlive = true;
-        private const float SPEED = 1.5f;
+        private const float SPEED = 2.0f;
         private float speed = SPEED;
         private float actualMovningSpeed=0;
         private bool isMoving = false;
@@ -72,12 +73,12 @@ namespace RemGame
         private bool showText = false;
 
         private DateTime previousJump = DateTime.Now;   // time at which we previously jumped
-        private const float jumpInterval = 1.1f;        // in seconds
+        private const float jumpInterval = 1.12f;        // in seconds
         private Vector2 jumpForce = new Vector2(0, -5); // applied force when jumping
 
         private DateTime previousSlide = DateTime.Now;   // time at which we previously jumped
-        private const float slideInterval = 0.7f;        // in seconds
-        private Vector2 slideForce = new Vector2(7, 0); // applied force when jumping
+        private const float slideInterval = 1.0f;        // in seconds
+        private Vector2 slideForce = new Vector2(5, 0); // applied force when jumping
 
         private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
         private const float shootInterval = 0.3f;        // in seconds
@@ -88,8 +89,8 @@ namespace RemGame
         
 
 
-        private AnimatedSprite anim;
-        private AnimatedSprite[] animations = new AnimatedSprite[3];
+        private AnimatedSprite anim = null;
+        private AnimatedSprite[] animations = new AnimatedSprite[4];
 
 
         KeyboardState keyboardState;
@@ -109,9 +110,11 @@ namespace RemGame
         public int Health { get => health; set => health = value; }
         public bool IsAlive { get => isAlive; set => isAlive = value; }
         public float ActualMovningSpeed { get => actualMovningSpeed; set => actualMovningSpeed = value; }
-
-        public Kid(World world, Texture2D torsoTexture, Texture2D wheelTexture,Texture2D bullet, Vector2 size, float mass, Vector2 startPosition,bool isBent,SpriteFont f)
+        
+        
+        public Kid(Texture2D hearts ,World world, Texture2D torsoTexture, Texture2D wheelTexture,Texture2D bullet, Vector2 size, float mass, Vector2 startPosition,bool isBent,SpriteFont f)
         {
+            this.hearts = hearts;
             this.world = world;
             this.size = size;
             this.texture = torsoTexture;
@@ -163,9 +166,11 @@ namespace RemGame
             axis1.CollideConnected = true;
             axis1.MotorEnabled = true;
             axis1.MotorSpeed = 0.0f;
-            axis1.MaxMotorTorque = 12.0f;
+            axis1.MaxMotorTorque = 3.0f;
 
             axis2 = JointFactory.CreateRevoluteJoint(world, upBody.Body, midBody.Body, Vector2.Zero);
+            //axis2 = JointFactory.CreateAngleJoint(world,upBody.Body,midBody.Body);
+
             axis2.CollideConnected = true;
             //axis2.MotorEnabled = false;
 
@@ -193,15 +198,21 @@ namespace RemGame
                 case Movement.Right:
                     lookRight = true;
                     axis1.MotorSpeed = MathHelper.TwoPi * speed;
+                    anim = animations[3];
                     break;
 
                 case Movement.Stop:
                     
-                    if (axis1.MotorSpeed != 0)
-                    { 
-                       axis1.MotorSpeed = 0;
-                       axis1.BodyB.ResetDynamics();        
-                    }
+                    //if (axis1.MotorSpeed != 0)
+                    //{
+                        axis1.MotorSpeed = 0;
+
+                        axis1.BodyB.ResetDynamics();
+                        axis1.BodyA.ResetDynamics();
+                        upBody.Body.ResetDynamics();
+
+
+                    //}
 
                     break;
             }
@@ -218,11 +229,9 @@ namespace RemGame
         public void Jump()
 
         {
-            isJumping = true;
-            
                 if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
                 {
-
+                    isJumping = true;
                     upBody.Body.ApplyLinearImpulse(jumpForce);
                     previousJump = DateTime.Now;
                 }
@@ -379,10 +388,20 @@ namespace RemGame
         {
             if (!isJumping)
             {
+                if (IsMoving)
+                {
+                    upBody.Body.CollidesWith = Category.None;
+                    speed = SPEED / 2;
+                    anim = animations[1];
+                }
+                else
+                {
+                    upBody.Body.CollidesWith = Category.None;
+                    anim = animations[0];
 
-                upBody.Body.CollidesWith = Category.None;
-                speed = SPEED / 2;
-                
+
+                }
+                //////shot single image crouch
             }
 
         }
@@ -413,6 +432,7 @@ namespace RemGame
                     upBody.Body.Enabled = false;
                     //torso.Body.Dispose();
                     //wheel.Body.Dispose();
+                    Health = 8;
                 }
             }
         
@@ -428,8 +448,11 @@ namespace RemGame
                 actualMovningSpeed = upBody.Body.AngularVelocity;
                 //bentPosition = new Vector2(torso.Position.X,torso.Position.Y-10);
 
-                if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
+                if ((DateTime.Now - previousJump).TotalSeconds <= jumpInterval && isJumping==true)
+                    isJumping = true;
+                else
                     isJumping = false;
+
                 if ((DateTime.Now - previousSlide).TotalSeconds >= slideInterval)
                 {
                     isSliding = false;
@@ -437,16 +460,18 @@ namespace RemGame
                     midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
                 }
 
-                anim = animations[2];
 
                 foreach (PhysicsObject s in shotList)
                 {
                     s.Update(gameTime);
                 }
+                if(!isMoving)
+                anim = animations[2];
 
                 //if (IsMoving) // apply animation
+                    Anim.Update(gameTime);
                 //else //player will appear as standing with frame [1] from the atlas.
-                //Anim.CurrentFrame = 1;
+                  //  Anim.CurrentFrame = 1;
 
                 IsMoving = false;
 
@@ -469,9 +494,7 @@ namespace RemGame
                     IsMoving = false;
                     Move(Movement.Stop);
 
-                    Anim = animations[2];
                 }
-                Anim.Update(gameTime);
 
 
                 //if statment should changed
@@ -581,12 +604,12 @@ namespace RemGame
         {
             if (!GameOver)
             {
-                upBody.Draw(gameTime, spriteBatch);
-                //Rectangle dest = torso.physicsObjRecToDraw();
-                //dest.Height = dest.Height+(int)wheel.Size.Y/2;
-                //dest.Y = dest.Y + (int)wheel.Size.Y/2;
-
-                //Anim.Draw(spriteBatch, dest, torso.Body);
+                //upBody.Draw(gameTime, spriteBatch);
+                Rectangle dest = upBody.physicsObjRecToDraw();
+                dest.Height = dest.Height+(int)wheel.Size.Y/2;
+                dest.Y = dest.Y + (int)wheel.Size.Y/2;
+                if(Anim!=null)
+                Anim.Draw(spriteBatch, dest, upBody.Body);
                 foreach (PhysicsObject s in shotList)
                 {
                     s.Draw(gameTime, spriteBatch);
@@ -603,13 +626,13 @@ namespace RemGame
                 //spriteBatch.Begin();
                 for (int i = 0; i < Health; i++)
                 {
-                    spriteBatch.Draw(shootTexture, new Vector2(Position.X - 900 + i * 60, Position.Y - 600), Color.White);
+                    spriteBatch.Draw(hearts, new Vector2(Position.X - 900 + i * 60, Position.Y - 600), Color.White);
                 }
                 // spriteBatch.End();
 
-                pv1.Draw(gameTime, spriteBatch);
-                pv2.Draw(gameTime, spriteBatch);
-                pv3.Draw(gameTime, spriteBatch);
+                //pv1.Draw(gameTime, spriteBatch);
+                //pv2.Draw(gameTime, spriteBatch);
+                //pv3.Draw(gameTime, spriteBatch);
 
                 //spriteBatch.DrawString(f, WheelSpeed.ToString(), new Vector2(Position.X + size.X, Position.Y), Color.White);
 
@@ -618,11 +641,16 @@ namespace RemGame
             }
             else
             {
+                
+                //needs to add a while loop for waiting 5 seconds before exiting to StartMenu
                 spriteBatch.DrawString(f, "GAME OVER!!!!!!", new Vector2(Position.X + size.X, Position.Y), Color.White);
 
             }
 
         }
-        
+        public static void MyDelay(int seconds)
+        {
+            
+        }
     }
 }
