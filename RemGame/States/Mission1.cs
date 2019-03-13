@@ -31,8 +31,8 @@ namespace RemGame
         KeyboardState keyboardState;
         KeyboardState prevKeyboardState = Keyboard.GetState();
         MouseState currentMouseState;
-        Texture2D playerLeft;
-        Texture2D playerRight;
+        Texture2D playerCrouch;
+        Texture2D playerCrouchWalk;
         Texture2D playerStand;
         Texture2D playerWalk;
         SpriteFont font;
@@ -74,6 +74,9 @@ namespace RemGame
         SoundEffect walking;
         SoundEffect jumping;
         SoundEffect hall;
+
+        bool isJumpSoundPlayed = false;
+
 
         SoundEffectInstance walkingInstance;
         SoundEffectInstance jumpingInstance;
@@ -214,11 +217,11 @@ namespace RemGame
             sc[9] = Sc10;
             sc[10] = Sc11;
             sc[11] = Sc12;
-            backGround1 = Content.Load<Texture2D>("Layers/level/row-1-col-1");
-            backGround2 = Content.Load<Texture2D>("Layers/level/row-1-col-2");
-            backGround3 = Content.Load<Texture2D>("Layers/level/row-1-col-3");
-            backGround4 = Content.Load<Texture2D>("Layers/level/row-1-col-4");
-            backGround5 = Content.Load<Texture2D>("Layers/level/row-1-col-5");
+            backGround1 = Content.Load<Texture2D>("Layers/level/1");
+            backGround2 = Content.Load<Texture2D>("Layers/level/2");
+            backGround3 = Content.Load<Texture2D>("Layers/level/3");
+            backGround4 = Content.Load<Texture2D>("Layers/level/4");
+            backGround5 = Content.Load<Texture2D>("Layers/level/5");
             for (int i = 0; i < 6; i++)
             {
                 sc[i].setRighttwinSc(sc[i + 6]);
@@ -249,8 +252,8 @@ namespace RemGame
                  100,
                  cam.ScreenToWorld(new Vector2(50, 400)), false, font);
 
-            playerLeft = Content.Load<Texture2D>("Player/playerLeft");
-            playerRight = Content.Load<Texture2D>("Player/playerRight");
+            playerCrouch = Content.Load<Texture2D>("Player/Anim/Ron_Crouch");
+            playerCrouchWalk = Content.Load<Texture2D>("Player/Anim/Ron_Crouch_Walk");
             playerStand = Content.Load<Texture2D>("Player/Anim/Ron_Stand");
             playerWalk = Content.Load<Texture2D>("Player/Anim/Ron_Walk");
 
@@ -272,12 +275,12 @@ namespace RemGame
 
 
 
-            Rectangle anim3 = new Rectangle(-30, -65, 240, 160);
-            Rectangle anim4 = new Rectangle(20, -50, 140, 130);
+            Rectangle anim3 = new Rectangle(-110, -65, 240, 160);
+            Rectangle anim4 = new Rectangle(0, -50, 140, 130);
 
 
-            player.Animations[0] = new AnimatedSprite(playerLeft, 1, 4, anim3, 0f);
-            player.Animations[1] = new AnimatedSprite(playerRight, 1, 4, anim3, 0f);
+            player.Animations[0] = new AnimatedSprite(playerCrouch, 1, 1, anim3, 0f);
+            player.Animations[1] = new AnimatedSprite(playerCrouchWalk, 2, 16, anim3, 0f);
 
             player.Animations[2] = new AnimatedSprite(playerStand, 4, 13, anim3, 0.017f);
 
@@ -343,27 +346,31 @@ namespace RemGame
             if (!player.IsBending)
             {
 
-                walkingInstance.Pitch = 0.0f;
-                if (player.IsMoving)
+                //walkingInstance.Pitch = 0.0f;
+                if (player.IsMoving && !player.IsJumping)
                 {
-
-                    //walkingInstance.Play();
-
+                    walkingInstance.Play();
                 }
 
                 else
                 {
-                    //walkingInstance.Stop();
+                    walkingInstance.Stop();
                 }
             }
             else
-                walkingInstance.Pitch = -0.5f;
-
-            if (player.IsJumping)
             {
-                //jumpingInstance.Play();
-
+                walkingInstance.Pitch = -0.5f;
+                walkingInstance.Volume = 0.01f;
             }
+
+            if (player.IsJumping && !isJumpSoundPlayed)
+            {
+                isJumpSoundPlayed = true;
+                jumpingInstance.Play();
+            }
+
+            if (!player.IsJumping)
+                isJumpSoundPlayed = false;
 
             camLocation = new Vector2(player.Position.X, player.Position.Y - 100);
 

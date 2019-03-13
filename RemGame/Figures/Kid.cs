@@ -61,6 +61,7 @@ namespace RemGame
         private int health = 8;
         private bool isAlive = true;
         private const float SPEED = 2.0f;
+
         private float speed = SPEED;
         private float actualMovningSpeed=0;
         private bool isMoving = false;
@@ -73,12 +74,21 @@ namespace RemGame
         private bool showText = false;
 
         private DateTime previousJump = DateTime.Now;   // time at which we previously jumped
-        private const float jumpInterval = 1.12f;        // in seconds
+        private const float jumpInterval = 1.2f;        // in seconds
         private Vector2 jumpForce = new Vector2(0, -5); // applied force when jumping
+        private float takeOffPoi = 0;
+        private float liftOff = 0;
+        private float beforeLanding = 0;
+        private bool goingDown = false;
+        private bool hasLanded = true;
+        private bool playLandingSound = false;
+
+
 
         private DateTime previousSlide = DateTime.Now;   // time at which we previously jumped
-        private const float slideInterval = 1.0f;        // in seconds
-        private Vector2 slideForce = new Vector2(5, 0); // applied force when jumping
+        private const float slideInterval = 1.3f;        // in seconds
+        private Vector2 slideForce = new Vector2(7, 0); // applied force when jumping
+        private float startPoint = 0;
 
         private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
         private const float shootInterval = 0.3f;        // in seconds
@@ -90,7 +100,7 @@ namespace RemGame
 
 
         private AnimatedSprite anim = null;
-        private AnimatedSprite[] animations = new AnimatedSprite[4];
+        private AnimatedSprite[] animations = new AnimatedSprite[12];
 
 
         KeyboardState keyboardState;
@@ -110,8 +120,10 @@ namespace RemGame
         public int Health { get => health; set => health = value; }
         public bool IsAlive { get => isAlive; set => isAlive = value; }
         public float ActualMovningSpeed { get => actualMovningSpeed; set => actualMovningSpeed = value; }
-        
-        
+        public bool HasLanded { get => hasLanded; set => hasLanded = value; }
+        public bool IsSliding { get => isSliding; set => isSliding = value; }
+        public bool PlayLandingSound { get => playLandingSound; set => playLandingSound = value; }
+
         public Kid(Texture2D hearts ,World world, Texture2D torsoTexture, Texture2D wheelTexture,Texture2D bullet, Vector2 size, float mass, Vector2 startPosition,bool isBent,SpriteFont f)
         {
             this.hearts = hearts;
@@ -186,35 +198,31 @@ namespace RemGame
 
         public void Move(Movement movement)
         {   
-            if(!IsBending)
+            if(!IsBending && !isJumping)
             speed = SPEED;
-            switch (movement)
+            if (!IsSliding && !IsJumping)
             {
-                case Movement.Left:
-                    lookRight = false;
-                    axis1.MotorSpeed = -MathHelper.TwoPi * speed;
-                    break;
+                switch (movement)
+                {
+                    case Movement.Left:
+                        lookRight = false;
+                        axis1.MotorSpeed = -MathHelper.TwoPi * speed;
+                            anim = animations[3];
+                        break;
 
-                case Movement.Right:
-                    lookRight = true;
-                    axis1.MotorSpeed = MathHelper.TwoPi * speed;
-                    anim = animations[3];
-                    break;
+                    case Movement.Right:
+                        lookRight = true;
+                        axis1.MotorSpeed = MathHelper.TwoPi * speed;
+                            anim = animations[3];
+                        break;
 
-                case Movement.Stop:
-                    
-                    //if (axis1.MotorSpeed != 0)
-                    //{
+                    case Movement.Stop:
                         axis1.MotorSpeed = 0;
-
                         axis1.BodyB.ResetDynamics();
                         axis1.BodyA.ResetDynamics();
                         upBody.Body.ResetDynamics();
-
-
-                    //}
-
-                    break;
+                        break;
+                }
             }
         }
 
@@ -229,26 +237,33 @@ namespace RemGame
         public void Jump()
 
         {
-                if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
-                {
-                    isJumping = true;
-                    upBody.Body.ApplyLinearImpulse(jumpForce);
-                    previousJump = DateTime.Now;
-                }
             
-            
+            if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
+            {
+                anim = animations[4];
+                isJumping = true;
+                takeOffPoi = wheel.Position.Y;
+                liftOff = wheel.Position.Y;
+                wheel.Body.ApplyLinearImpulse(jumpForce);
+                goingDown = false;
+                HasLanded = false;
+                previousJump = DateTime.Now;
+
+            }
+
         }
-        
+
         //should create variables for funciton
         public void Slide(Movement dir)
         {
             speed = SPEED;
-            if (!isJumping)
+            if (!isJumping && !isBending)
             {
                 if ((DateTime.Now - previousSlide).TotalSeconds >= slideInterval)
                 {
-                    isSliding = true;
-                    IsMoving = true;
+                    anim = animations[9];
+                    startPoint = wheel.Position.X;
+                    IsSliding = true;
                     upBody.Body.CollidesWith = Category.None;
                     midBody.Body.CollidesWith = Category.None;
                     if (dir == Movement.Right)
@@ -261,7 +276,6 @@ namespace RemGame
                     }
 
                     previousSlide = DateTime.Now;
-
                 }
             }
         }
@@ -386,7 +400,7 @@ namespace RemGame
 
         public void bend()
         {
-            if (!isJumping)
+            if (!isJumping && !IsSliding)
             {
                 if (IsMoving)
                 {
@@ -398,8 +412,6 @@ namespace RemGame
                 {
                     upBody.Body.CollidesWith = Category.None;
                     anim = animations[0];
-
-
                 }
                 //////shot single image crouch
             }
@@ -441,6 +453,7 @@ namespace RemGame
 
         public override void Update(GameTime gameTime)
         {
+            
             if (isAlive)
             {
                 keyboardState = Keyboard.GetState();
@@ -448,41 +461,92 @@ namespace RemGame
                 actualMovningSpeed = upBody.Body.AngularVelocity;
                 //bentPosition = new Vector2(torso.Position.X,torso.Position.Y-10);
 
-                if ((DateTime.Now - previousJump).TotalSeconds <= jumpInterval && isJumping==true)
-                    isJumping = true;
-                else
-                    isJumping = false;
-
-                if ((DateTime.Now - previousSlide).TotalSeconds >= slideInterval)
+                if(!HasLanded && isJumping)
                 {
-                    isSliding = false;
-                    upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
-                    midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+                    isMoving = true;
+
+                    if (wheel.Position.Y <= liftOff)
+                    {
+                        liftOff = wheel.Position.Y;
+                        anim = animations[4];
+                        if (wheel.Position.Y <= takeOffPoi - 60)
+                        {
+                            anim = animations[5];
+                        }
+
+                    }
+
+                    else if (wheel.Position.Y > liftOff && !goingDown)
+                    {
+                        goingDown = true;
+                        beforeLanding = wheel.Position.Y;
+                        anim = animations[6];
+
+                    }
+                    else if (wheel.Position.Y > beforeLanding)
+                    {
+                        beforeLanding = wheel.Position.Y;
+                        if (wheel.Position.Y > takeOffPoi - 140)
+                            anim = animations[7];
+                        if(wheel.Position.Y > takeOffPoi - 50)
+                            anim = animations[8];
+                    }
+                    else
+                    {
+                        PlayLandingSound = true;
+                        anim = animations[2];
+                        goingDown = false;
+                        HasLanded = true;
+                        isJumping = false;
+                        isMoving = false;
+                        liftOff = 0;
+                    }
+
+
                 }
+
+
+                if(IsSliding)
+                {
+                    if (wheel.Position.X > startPoint + 100 || wheel.Position.X < startPoint - 100)
+                    {
+                        anim = animations[10];
+                    }
+
+                    if (wheel.Position.X > startPoint + 350 || wheel.Position.X < startPoint - 350)
+                    {
+                        anim = animations[11];
+                    }
+                    if (wheel.Position.X > startPoint + 450 || wheel.Position.X < startPoint - 450)
+                    {
+                        IsSliding = false;
+                        upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+                        midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+                    }
+
+                 }
 
 
                 foreach (PhysicsObject s in shotList)
                 {
                     s.Update(gameTime);
                 }
-                if(!isMoving)
-                anim = animations[2];
+                
 
                 //if (IsMoving) // apply animation
-                    Anim.Update(gameTime);
                 //else //player will appear as standing with frame [1] from the atlas.
                   //  Anim.CurrentFrame = 1;
 
                 IsMoving = false;
 
-                if (keyboardState.IsKeyDown(Keys.Left))
+                if (keyboardState.IsKeyDown(Keys.A))
                 {
                     Move(Movement.Left);
                     direction = Movement.Left;
                     IsMoving = true;
 
                 }
-                else if (keyboardState.IsKeyDown(Keys.Right))
+                else if (keyboardState.IsKeyDown(Keys.D))
                 {
                     Move(Movement.Right);
                     direction = Movement.Right;
@@ -498,43 +562,43 @@ namespace RemGame
 
 
                 //if statment should changed
-                if (keyboardState.IsKeyDown(Keys.Space) && !(prevKeyboardState.IsKeyDown(Keys.Space)))
+                if (keyboardState.IsKeyDown(Keys.Space) && (!prevKeyboardState.IsKeyDown(Keys.Space)))
                 {
                     Jump();
                 }
 
                 if (isJumping)
                 {
-                    if (keyboardState.IsKeyDown(Keys.Right) && (!prevKeyboardState.IsKeyDown(Keys.Right)))
+                    if (keyboardState.IsKeyDown(Keys.D))
                     {
-                        wheel.Body.ApplyLinearImpulse(new Vector2(1.5f, 0));
+                        wheel.Body.ApplyLinearImpulse(new Vector2(0.03f, 0));
                     }
 
-                    else if (keyboardState.IsKeyDown(Keys.Left) && (!prevKeyboardState.IsKeyDown(Keys.Left)))
+                    else if (keyboardState.IsKeyDown(Keys.A))
                     {
-                        wheel.Body.ApplyLinearImpulse(new Vector2(-1.5f, 0));
+                        wheel.Body.ApplyLinearImpulse(new Vector2(-0.03f, 0));
                     }
                 }
 
-                if (keyboardState.IsKeyDown(Keys.LeftShift) && !(prevKeyboardState.IsKeyDown(Keys.LeftShift)))
+                if (keyboardState.IsKeyDown(Keys.LeftShift) && (!prevKeyboardState.IsKeyDown(Keys.LeftShift)))
                 {
 
-                    if (keyboardState.IsKeyDown(Keys.Right))
+                    if (keyboardState.IsKeyDown(Keys.D))
                         Slide(Movement.Right);
 
-                    else if (keyboardState.IsKeyDown(Keys.Left))
+                    else if (keyboardState.IsKeyDown(Keys.A))
                         Slide(Movement.Left);
 
                 }
 
-                if (currentMouseState.LeftButton == ButtonState.Pressed && !(previousMouseState.LeftButton == ButtonState.Pressed))
+                if (currentMouseState.RightButton == ButtonState.Pressed && !(previousMouseState.RightButton == ButtonState.Pressed))
                 {
                     shootDirection = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
 
                     //Console.WriteLine("start: " + currentMouseState.Position.X + " " + currentMouseState.Position.Y);
 
                 }
-                if (currentMouseState.LeftButton == ButtonState.Released && (previousMouseState.LeftButton == ButtonState.Pressed))
+                if (currentMouseState.RightButton == ButtonState.Released && (previousMouseState.RightButton == ButtonState.Pressed) && !(previousMouseState.LeftButton == ButtonState.Pressed))
                 {
                     shootBase = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
                     Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X), (shootDirection.Y - shootBase.Y));
@@ -542,15 +606,15 @@ namespace RemGame
                         rangedShoot(shootForce * 4);
                 }
 
+                if (currentMouseState.LeftButton == ButtonState.Pressed && !(previousMouseState.LeftButton == ButtonState.Pressed) && !(currentMouseState.RightButton == ButtonState.Pressed))
 
-                if (keyboardState.IsKeyDown(Keys.LeftControl) && !(prevKeyboardState.IsKeyDown(Keys.LeftControl)))
+                //if (keyboardState.IsKeyDown(Keys.LeftControl) && !(prevKeyboardState.IsKeyDown(Keys.LeftControl)))
                 {
                     Shoot();
 
                 }
-
-
-
+                //////////////////////////////////////////SCENE/////////////////////////////////////////////////////////////////////////////
+                /*
                 if (Position.X < 400)
                 {
                     wheel.Body.ApplyLinearImpulse(new Vector2(1, 0));
@@ -562,31 +626,26 @@ namespace RemGame
                 }
                 else
                     showText = false;
+                */
 
 
-
-                if (keyboardState.IsKeyDown(Keys.Down))
+                if (keyboardState.IsKeyDown(Keys.S))
                 {
-                    // axis1.BodyA.IgnoreCollisionWith(axis1.BodyB);
-                    //axis1.BodyB.IgnoreCollisionWith(axis1.BodyA);
-                    //if(torso.Position.Y +96 != wheel.Position.Y+48)
                     bend();
-
-
                     IsBending = true;
-                    /*
-                    if(keyboardState.IsKeyDown(Keys.Space) && !(prevKeyboardState.IsKeyDown(Keys.Space)))
-                    {
-                        wheel.Body.CollidesWith = Category.Cat30;
-                    }
-                    */
+
                 }
 
-                if (keyboardState.IsKeyUp(Keys.Down) && prevKeyboardState.IsKeyDown(Keys.Down))
+                if (keyboardState.IsKeyUp(Keys.S) && prevKeyboardState.IsKeyDown(Keys.S))
                 {
                     IsBending = false;
                     upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
                 }
+
+                if (!isMoving && !IsBending && !isJumping && !IsSliding)
+                    anim = animations[2];
+
+                Anim.Update(gameTime);
 
 
                 previousMouseState = currentMouseState;
@@ -608,36 +667,37 @@ namespace RemGame
                 Rectangle dest = upBody.physicsObjRecToDraw();
                 dest.Height = dest.Height+(int)wheel.Size.Y/2;
                 dest.Y = dest.Y + (int)wheel.Size.Y/2;
-                if(Anim!=null)
-                Anim.Draw(spriteBatch, dest, upBody.Body);
+                if (Anim != null)
+                {
+                    if(direction == Movement.Right)
+                        Anim.Draw(spriteBatch, dest, upBody.Body,false);
+                    else
+                        Anim.Draw(spriteBatch, dest, upBody.Body, true);
+
+                }
                 foreach (PhysicsObject s in shotList)
                 {
                     s.Draw(gameTime, spriteBatch);
                 }
                 if (isRangeAttacking && !(shoot.Body.IsDisposed))
                     shoot.Draw(gameTime, spriteBatch);
-
+                /*
                 if (showText)
                 {
 
                     spriteBatch.DrawString(f, "ho HEY,im ron i got schyzofrenia", new Vector2(Position.X + size.X, Position.Y), Color.White);
                 }
-
-                //spriteBatch.Begin();
+                */
+                
                 for (int i = 0; i < Health; i++)
                 {
                     spriteBatch.Draw(hearts, new Vector2(Position.X - 900 + i * 60, Position.Y - 600), Color.White);
                 }
-                // spriteBatch.End();
-
+              
                 //pv1.Draw(gameTime, spriteBatch);
                 //pv2.Draw(gameTime, spriteBatch);
                 //pv3.Draw(gameTime, spriteBatch);
-
-                //spriteBatch.DrawString(f, WheelSpeed.ToString(), new Vector2(Position.X + size.X, Position.Y), Color.White);
-
-
-                //wheel.Draw(gameTime,spriteBatch);
+          
             }
             else
             {
