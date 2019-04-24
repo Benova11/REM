@@ -46,6 +46,7 @@
     <Compile Include="LevelDesgin\Chair.cs" />
     <Compile Include="LevelDesgin\Door.cs" />
     <Compile Include="LevelDesgin\Ground.cs" />
+    <Compile Include="Utils\HealthBar.cs" />
     <Compile Include="LevelDesgin\Locker.cs" />
     <Compile Include="LevelDesgin\Table.cs" />
     <Compile Include="States\BaseGameState.cs" />
@@ -54,7 +55,7 @@
     <Compile Include="States\GameOverState.cs" />
     <Compile Include="States\GameStateInterfaces.cs" />
     <Compile Include="LevelDesgin\Map.cs" />
-    <Compile Include="LevelDesgin\ScrollingBackground.cs" />
+    <Compile Include="Utils\ScrollingBackground.cs" />
     <Compile Include="LevelDesgin\Tile.cs" />
     <Compile Include="States\Mission1.cs" />
     <Compile Include="States\MissionCompleteState.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="Component.cs" />
     <Compile Include="Utils\CoordinateHelper.cs" />
     <Compile Include="Figures\Enemy.cs" />
-    <Compile Include="LevelDesgin\Floor.cs" />
     <Compile Include="Figures\Kid.cs" />
     <Compile Include="LevelDesgin\Obstacle.cs" />
     <Compile Include="Utils\ISoundManager.cs" />
@@ -105,6 +105,10 @@
     <ProjectReference Include="..\Farseer\Farseer.csproj">
       <Project>{0b03b2d6-bcdb-4e07-aafa-4ef84ea6a31b}</Project>
       <Name>Farseer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LevelDesignerGui\LevelDesignerGui.csproj">
+      <Project>{bfe6ad84-9f92-4aea-a356-838a83102875}</Project>
+      <Name>LevelDesignerGui</Name>
     </ProjectReference>
     <ProjectReference Include="..\XELibrary\XELibrary.csproj">
       <Project>{623010cd-3e24-4f0e-9eae-922dad230975}</Project>
