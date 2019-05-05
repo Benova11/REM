@@ -11,10 +11,15 @@ using Microsoft.Xna.Framework.Content;
 
 namespace RemGame
 {
+    /// <summary>
+    /// an map object holds information on the current level as each level holds map object.
+    /// the map class aimed to read the matrix represnts objects location in a level and genrate those objects into the level.
+    /// moreover the map calss is used as an input to the A* algorithem to calculate npc's behavoir.
+    /// </summary>
     class Map
     {
 
-        private int[,] grid;
+        private int[,] grid;//the matrix which represnts objects location in the level.
         //private List<CollisionTiles> collisionTiles = new List<CollisionTiles>();
         private List<Tile> collisionTiles = new List<Tile>();
         private List<Obstacle> obstacleTiles = new List<Obstacle>();
@@ -24,17 +29,20 @@ namespace RemGame
         private int enemies_counter = 2;
         private int width, height;
         private World world;
-        public Texture2D texture;
+        private Texture2D texture;
+
+        //holdes eace value as {object value in matrix,is it passable as bool}
+        public Dictionary<int, bool> passableDict = new Dictionary<int, bool>();
+
         private static ContentManager content;
+
         Random r;
+
         private bool finished_tutorial = false;
-        
 
         /// delete font
         private SpriteFont font;
         /// 
-     
-
 
         public Map(World world,Kid player)
         {
@@ -43,19 +51,18 @@ namespace RemGame
         }
 
         public List<Tile> CollisionTiles { get => collisionTiles; }
-
         public int Width { get => width; }
         public int Height { get => height; }
         public static ContentManager Content { protected get => content; set => content = value; }
         public List<Obstacle> ObstacleTiles { get => obstacleTiles; set => obstacleTiles = value; }
         public List<Enemy> Enemies { get => enemies; set => enemies = value; }
-        public Dictionary<int, bool> passableDict =
-                    new Dictionary<int, bool>();
         public bool Finished_tutorial { get => finished_tutorial; set => finished_tutorial = value; }
 
         //public List<CollisionTiles> CollisionTiles { get => collisionTiles; }
         public int Enemies_counter { get => enemies_counter; set => enemies_counter = value; }
+        public int[,] Grid { get => grid;}
 
+        //Construct each object as reprasented in the matrix in the location which calculated by : position in physics world = grid[x][y]*64.
         public void Generate(int[,] map, int size, SpriteFont font)
         {
             /////delete font//////
@@ -108,11 +115,6 @@ namespace RemGame
                     {
                         Door door = new Door(world, texture, new Vector2(64, 64), font,false);
                         door.Position = new Vector2(x * size + (door.Size.X / 2), y * size);
-
-                        /*
-                        if (number == 2)
-                            obs.Body.CollisionCategories = Category.Cat30;
-                            */
                         ObstacleTiles.Add(door);
                         if (!passableDict.ContainsKey(3))
                             passableDict.Add(3, door.Passable);
@@ -161,17 +163,16 @@ namespace RemGame
                     }
                     else if (number == 8)//enemy
                     {
-                        Console.WriteLine("x: " + x + " y: " + y);
-                        Point startLocationGrid = new Point(y, x);
+                        Point startLocationGrid = new Point(x, y+2);
                         r = new Random();
                         int rInt = r.Next(192, 320);
                         Enemy en = new Enemy(world,
                         new Vector2(96, 96),
                         100,
-                        new Vector2(y * 64, x * 64 - 600),startLocationGrid,10, font, rInt, this,player);
-                        Point enemeyGridLocation = new Point(scaleToGrid(en.Position.X / 64.0f), (int)en.Position.Y / 64);
-                        en.GridLocation = enemeyGridLocation;                       
+                        new Vector2(x * 64+size/2, y * 64),startLocationGrid,10, font, rInt, this,player);
+                        en.GridLocation = startLocationGrid;                       
                         Enemies.Add(en);
+                        en.setAstarsquare(texture);
                     }
                     else if (number == 9)
                     {
@@ -196,43 +197,33 @@ namespace RemGame
 
         public void Update(GameTime gameTime)
         {
-            
-            
-            player.GridLocation = new Point(scaleToGrid(player.Position.X / 64), (int)player.Position.Y / 64);
+                       
+            player.GridLocation = new Point(scaleToGrid(player.Position.X / 64), ((int)player.Position.Y / 64)+2);
 
             foreach (Enemy en in Enemies)
             {
 
-                en.Update(gameTime, player.Position, player.IsAlive);
-                Point enemeyGridLocation = new Point(scaleToGrid(en.Position.X / 64), scaleToGrid(en.Position.Y / 64));
+                en.Update(gameTime, player.Position, player.IsAlive,20);
+                Point enemeyGridLocation = new Point(scaleToGrid(en.Position.X / 64), ((int)en.Position.Y / 64) +2);
                 en.GridLocation = enemeyGridLocation;
                 if (en.Health == 0)
                 {
                     enemies_counter--;
                 }
             }
+
             Enemies.RemoveAll(Enemy => Enemy.Health == 0);
 
             foreach (Obstacle ob in obstacleTiles)
             {
                 Point obstacleGridLocation = new Point((int)ob.Position.X / 64, (int)ob.Position.Y / 64);
-                /*
-                if (ob.Position.X / 64 > (int)ob.Position.X / 64)
-                {
-                    obstacleGridLocation.X++;
-                }
-                if (ob.Position.Y / 64 > (int)ob.Position.Y / 64)
-                {
-                    obstacleGridLocation.Y++;
 
-                }
-                */
                 ob.GridLocation = obstacleGridLocation;
 
             }
 
         }
-
+        //for debbbuging
         public void DrawGrid(GameTime gameTime, int[,] gameMap, SpriteBatch spriteBatch, SpriteFont f)
         {
             for (int x = 0; x < gameMap.GetLength(1); x++)
@@ -244,7 +235,6 @@ namespace RemGame
 
             }
         }
-
 
 
         public void DrawObstacle(GameTime gameTime, SpriteBatch spriteBatch)
@@ -264,29 +254,28 @@ namespace RemGame
         public int getGridObject(int x,int y)
         {
             if (x > 0 && y > 0)
-                return grid[x, y];
+                return Grid[y, x];
             else
-                return 0;
+                return 100;
         }
 
         public bool isPassable(int x, int y)
         {
-            if (passableDict.TryGetValue(grid[x, y], out bool check))
+            if (x > 1 && y > 1 && x<width/64 && y<height/64)
             {
-                if (check)
-                    return true;
-                else
-                    return false;
+                if (passableDict.TryGetValue(Grid[y, x], out bool check))
+                {
+                    if (check)
+                        return true;
+                    else
+                        return false;
+                }
             }
-            else
-            {
-                return false;
-
-            }
-
+ 
+            return false;
         }
 
-        private int scaleToGrid(float x)
+        private int scaleToGrid(float x)//scale the difrrences between grid(int) and physics world(float)
         {
             float tmp = x;
             int scale = (int)tmp;
@@ -296,7 +285,5 @@ namespace RemGame
                 return --scale;
             
         }
-
-
     }
 }

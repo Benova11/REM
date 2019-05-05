@@ -19,13 +19,21 @@ namespace RemGame
     /// ///////////////EDit///////////////////////////////////////////////////
     /// </summary>
     /// ///////////////////////////////////////////////////////////////////////////
+    /// 
+    enum Movement
+    {
+        Left,
+        Right,
+        Jump,
+        Stop
+    }
     class Enemy
     {
-        public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
 
+        public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
+        private int itrator = 0;
         private static ContentManager content;
         Random random;
-
         private Point startLocationGrid;
 
         bool pingPong = false;
@@ -89,6 +97,15 @@ namespace RemGame
 
         private float evasionLuck;
 
+        List<Vector2> path;
+        private Vector2[] patrolGridPath;
+        private Vector2[] playerGridPath;
+
+        Texture2D gridColor;
+
+
+
+
         /// <summary>
         /// //////////////////////////////Working on new behavoir - Ai//////////////////////////////////////////////////////////////////////////////
         /// </summary>
@@ -117,16 +134,10 @@ namespace RemGame
         private AnimatedSprite[] animations = new AnimatedSprite[2];
 
 
-        KeyboardState keyboardState;
-        KeyboardState prevKeyboardState = Keyboard.GetState();
-
-        MouseState currentMouseState;
-        MouseState previousMouseState = Mouse.GetState();
-
         Texture2D shootTexture;
 
 
-        public Enemy(World world, Vector2 size, float mass, Vector2 startPosition, Point startLocationGrid,int patrolRange, SpriteFont f, int newDistance, Map map, Kid player)
+        public Enemy(World world, Vector2 size, float mass, Vector2 startPosition, Point startLocationGrid, int patrolRange, SpriteFont f, int newDistance, Map map, Kid player)
         {
 
             this.world = world;
@@ -192,7 +203,7 @@ namespace RemGame
         public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
         public AnimatedSprite Anim { get => anim; set => anim = value; }
         public AnimatedSprite[] Animations { get => animations; set => animations = value; }
-        internal Movement Direction { get => direction; set => direction = value; }
+        public Movement Direction { get => direction; set => direction = value; }
         public Vector2 Position { get => torso.Position; }
         public int Distance { get => distance; set => distance = value; }
         public Point GridLocation { get => gridLocation; set => gridLocation = value; }
@@ -322,193 +333,333 @@ namespace RemGame
             torso.Body.IgnoreCollisionWith(wheel.Body);
             torso.Position = wheel.Position;
         }
-        public void Update(GameTime gameTime, Vector2 playerPosition, bool PlayerAlive)
+
+        public void Update(GameTime gameTime, Vector2 playerPosition, bool PlayerAlive, int patrolbound)
         {
-            anim = Animations[0];
-            anim = Animations[(int)direction];
 
-            if (isMoving) // apply animation
-                Anim.Update(gameTime);
-            else //player will appear as standing with frame [1] from the atlas.
-                Anim.CurrentFrame = 1;
+            bool reached = false;
 
-            UpdateAI();
-        }
+            if (gridLocation == startLocationGrid)
+                PathFinder.SetMap(map);
 
-
-    
-        /*
-        public void Update(GameTime gameTime,Vector2 playerPosition, bool PlayerAlive)
-        {
-            if (!PlayerAlive)
-                isPlayerAlive = false;
-            keyboardState = Keyboard.GetState();
-            currentMouseState = Mouse.GetState();
-
-            anim = Animations[0];
-            anim = Animations[(int)direction];
-
-            if (isMoving) // apply animation
-                Anim.Update(gameTime);
-            else //player will appear as standing with frame [1] from the atlas.
-                Anim.CurrentFrame = 1;
-
-
-            isMoving = false;
-            if (keyboardState.IsKeyDown(Keys.Q) && !(prevKeyboardState.IsKeyDown(Keys.Q)))
+            if (itrator == 0)
             {
-                if (!Ghost)
+                patrolGridPath = findPathToPatrol();
+            }
+            if (player.GridLocation != null)
+                playerGridPath = findPathToPlayer();
+
+            if (patrolGridPath != null)
+            {
+                if (itrator == patrolGridPath.Length - 1)
                 {
-                    torso.Body.Enabled = false;
-                    wheel.Body.Enabled = false;
-                    isMoving = false;
-                    Ghost = true;
+                    itrator = 0;
+                }
+                if (gridLocation.ToVector2() != patrolGridPath[patrolGridPath.Length - 1])
+                {
+                    isMoving = true;
+
+                    if (gridLocation.ToVector2() == patrolGridPath[itrator])
+                    {
+
+                        if (patrolGridPath[itrator + 1].X > gridLocation.X)
+                        {
+                            direction = Movement.Right;
+                            Move(Movement.Right);
+                        }
+
+
+                        if (patrolGridPath[itrator + 1].X < gridLocation.X)
+                        {
+                            direction = Movement.Left;
+                            Move(Movement.Left);
+                        }
+
+                        if (patrolGridPath[itrator + 1].Y < gridLocation.Y)
+                        {
+                            wheel.Body.ApplyLinearImpulse(new Vector2(0, -6));
+                            isMoving = false;
+
+                        }
+
+
+
+                        itrator++;
+
+                    }
+
                 }
                 else
                 {
+                    Move(Movement.Stop);
+                    isMoving = false;
+                    patrolGridPath = findPathToPatrol();
 
-                    torso.Body.Enabled = true;
-                    wheel.Body.Enabled = true;
-                    Ghost = false;
                 }
+                /*
+                if (patrolGridPath[itrator].Y == gridLocation.Y && map.isPassable((int)patrolGridPath[itrator].X + 1, (int)patrolGridPath[itrator].Y))
+                {
+                   
+                    if (gridLocation.ToVector2() != patrolGridPath[itrator + 1])
+                    {
+                        Move(Movement.Right);
+                        direction = Movement.Right;
+                        isMoving = true;
+                    }
+                    else
+                        reached = true;
+
+                    if(reached)
+                    {
+                        itrator++;
+                        //Move(Movement.Stop);
+                        //isMoving = false;
+
+                    }
+
+                    if (patrolGridPath[itrator + 1].Y < gridLocation.Y)
+                    {
+                        isMoving = false;
+                        wheel.Body.ApplyLinearImpulse(new Vector2(0, -6));
+                    }
+                }
+                */
+                /*
+                if (gridLocation.ToVector2() != gridpath[itrator])
+                {
+                    Move(Movement.Right);
+                    direction = Movement.Right;
+                    isMoving = true;
+                }
+                else
+                */
+
+                Console.WriteLine("grid vector :" + patrolGridPath[itrator] + "enemy vector :" + gridLocation);
+                Console.WriteLine(itrator);
+            }
+            /*
+            else if(gridpath[itrator].Y == y && gridLocation.X == gridpath[itrator].X)
+            {
+                Move(Movement.Left);
+                direction = Movement.Left;
+                isMoving = true;
+            }
+            
+            else if (gridpath[itrator].Y < gridLocation.Y && gridpath[itrator].X == gridLocation.X + 1)
+            {
+                wheel.Body.ApplyLinearImpulse(new Vector2(0, -2));
+                itrator++;
+                Console.WriteLine(" WANTS TO JUMP grid vector :" + gridpath[itrator] + "enemy vector :" + gridLocation);
 
             }
+            */
 
-            if (!torso.Body.IsDisposed) {
-                if (gridLocation.X > 3 && gridLocation.Y >3)
-                for (int i = 1; i <= 2; i++)
+
+            anim = Animations[0];
+            anim = Animations[(int)direction];
+
+            if (isMoving) // apply animation
+                Anim.Update(gameTime);
+            else //player will appear as standing with frame [1] from the atlas.
+                Anim.CurrentFrame = 1;
+
+            //UpdateAI();
+
+
+            /*
+            public void Update(GameTime gameTime,Vector2 playerPosition, bool PlayerAlive)
+            {
+                if (!PlayerAlive)
+                    isPlayerAlive = false;
+                keyboardState = Keyboard.GetState();
+                currentMouseState = Mouse.GetState();
+
+                anim = Animations[0];
+                anim = Animations[(int)direction];
+
+                if (isMoving) // apply animation
+                    Anim.Update(gameTime);
+                else //player will appear as standing with frame [1] from the atlas.
+                    Anim.CurrentFrame = 1;
+
+
+                isMoving = false;
+                if (keyboardState.IsKeyDown(Keys.Q) && !(prevKeyboardState.IsKeyDown(Keys.Q)))
                 {
-                    if (map.getGridObject(gridLocation.X + i, gridLocation.Y) == 7 || map.getGridObject(gridLocation.X + i, gridLocation.Y + 1) == 7 || map.getGridObject(gridLocation.X + i, gridLocation.Y - 1) == 7)
+                    if (!Ghost)
                     {
-                        collideRight = true;
+                        torso.Body.Enabled = false;
+                        wheel.Body.Enabled = false;
+                        isMoving = false;
+                        Ghost = true;
                     }
-                    if (map.getGridObject(gridLocation.X - i, gridLocation.Y) == 7 || map.getGridObject(gridLocation.X - i, gridLocation.Y + 1) == 7 || map.getGridObject(gridLocation.X - i, gridLocation.Y - 1) == 7)
+                    else
                     {
-                        collideLeft = true;
+
+                        torso.Body.Enabled = true;
+                        wheel.Body.Enabled = true;
+                        Ghost = false;
                     }
 
                 }
 
-                int dir = 0;
-                if (playerPosition.X > Position.X - 200 && playerPosition.X < Position.X + 200 && isPlayerAlive &&(playerPosition.Y < position.Y + size.X * 2 && playerPosition.Y + 3 * size.X > position.Y))
+                if (!torso.Body.IsDisposed) {
+                    if (gridLocation.X > 3 && gridLocation.Y >3)
+                    for (int i = 1; i <= 2; i++)
                     {
-                    speed = SPEED;
-                    
-                    isBackToLastPos = false;
-                
-                        if (playerPosition.X < Position.X - 150 )
+                        if (map.getGridObject(gridLocation.X + i, gridLocation.Y) == 7 || map.getGridObject(gridLocation.X + i, gridLocation.Y + 1) == 7 || map.getGridObject(gridLocation.X + i, gridLocation.Y - 1) == 7)
                         {
+                            collideRight = true;
+                        }
+                        if (map.getGridObject(gridLocation.X - i, gridLocation.Y) == 7 || map.getGridObject(gridLocation.X - i, gridLocation.Y + 1) == 7 || map.getGridObject(gridLocation.X - i, gridLocation.Y - 1) == 7)
+                        {
+                            collideLeft = true;
+                        }
+
+                    }
+
+                    int dir = 0;
+                    if (playerPosition.X > Position.X - 200 && playerPosition.X < Position.X + 200 && isPlayerAlive &&(playerPosition.Y < position.Y + size.X * 2 && playerPosition.Y + 3 * size.X > position.Y))
+                        {
+                        speed = SPEED;
+
+                        isBackToLastPos = false;
+
+                            if (playerPosition.X < Position.X - 150 )
+                            {
+                                Move(Movement.Left);
+                                isMoving = true;
+                                direction = Movement.Left;
+                                this.meleAttack();
+
+                            }
+                            else if (playerPosition.X > Position.X + 150)
+                            {
+                                Move(Movement.Right);
+                                isMoving = true;
+                                direction = Movement.Right;
+                                this.meleAttack();
+
+                            }
+
+                            else
+                            {
+                                Move(Movement.Stop);
+                                this.meleAttack();
+                            }
+
+                        }
+
+                    else if (!isBackToLastPos)
+                    {
+
+                        speed = 0.2f;
+                        if (lastPosition.X + 4 < Position.X)
+                        {
+
                             Move(Movement.Left);
                             isMoving = true;
                             direction = Movement.Left;
-                            this.meleAttack();
-
                         }
-                        else if (playerPosition.X > Position.X + 150)
+                        else if (lastPosition.X - 4 > Position.X)
                         {
                             Move(Movement.Right);
                             isMoving = true;
                             direction = Movement.Right;
-                            this.meleAttack();
+                        }
+                        else
+                        {
+                            Move(Movement.Stop);
+                            isBackToLastPos = true;
+                        }
+
+
+                    }
+                    else if (isBackToLastPos)
+                    {
+
+                        speed = SPEED;
+
+                        if (!(pingPong) && Position.X <= lastPosition.X + distance - size.X / 2 && !(Ghost)&&!collideRight)
+                        {
+
+                                Move(Movement.Right);
+                                isMoving = true;
+                                direction = Movement.Right;
+
+                        }
+
+                        else if (!(Ghost))
+                        {
+                            pingPong = true;
+                            if (pingPong && Position.X >= lastPosition.X + size.X / 2 - distance &&!collideLeft)
+
+                            {
+
+                                    Move(Movement.Left);
+                                    isMoving = true;
+                                    direction = Movement.Left;
+
+
+                            }
+                            else
+                                pingPong = false;
 
                         }
 
                         else
                         {
                             Move(Movement.Stop);
-                            this.meleAttack();
                         }
-                    
-                    }
-                
-                else if (!isBackToLastPos)
-                {
-
-                    speed = 0.2f;
-                    if (lastPosition.X + 4 < Position.X)
-                    {
-
-                        Move(Movement.Left);
-                        isMoving = true;
-                        direction = Movement.Left;
-                    }
-                    else if (lastPosition.X - 4 > Position.X)
-                    {
-                        Move(Movement.Right);
-                        isMoving = true;
-                        direction = Movement.Right;
-                    }
-                    else
-                    {
-                        Move(Movement.Stop);
-                        isBackToLastPos = true;
+                        collideLeft = false;
+                        collideRight = false;
                     }
 
-                    
                 }
-                else if (isBackToLastPos)
-                {
 
-                    speed = SPEED;
+                if (isMeleAttacking)
+                    mele.Update(gameTime);
 
-                    if (!(pingPong) && Position.X <= lastPosition.X + distance - size.X / 2 && !(Ghost)&&!collideRight)
-                    {
-                        
-                            Move(Movement.Right);
-                            isMoving = true;
-                            direction = Movement.Right;
-                        
-                    }
+                previousMouseState = currentMouseState;
+                prevKeyboardState = keyboardState;
 
-                    else if (!(Ghost))
-                    {
-                        pingPong = true;
-                        if (pingPong && Position.X >= lastPosition.X + size.X / 2 - distance &&!collideLeft)
-
-                        {
-                            
-                                Move(Movement.Left);
-                                isMoving = true;
-                                direction = Movement.Left;
-
-                            
-                        }
-                        else
-                            pingPong = false;
-
-                    }
-
-                    else
-                    {
-                        Move(Movement.Stop);
-                    }
-                    collideLeft = false;
-                    collideRight = false;
-                }
-                
             }
-
-            if (isMeleAttacking)
-                mele.Update(gameTime);
-                
-            previousMouseState = currentMouseState;
-            prevKeyboardState = keyboardState;
-
+      */
+            //needs to be changed
         }
-  */
-        //needs to be changed
-
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, SpriteFont font)
         {
+            if (patrolGridPath != null)
+            {
+                for (int i = 0; i < patrolGridPath.Length; i++)
+                {
+                    Rectangle gridloc = new Rectangle((int)patrolGridPath[i].X * 64, (int)patrolGridPath[i].Y * 64, 64, 64);
+                    if (gridLocation.ToVector2() != patrolGridPath[i])
+                        spriteBatch.Draw(gridColor, gridloc, Color.Red);
+                    else
+                        spriteBatch.Draw(gridColor, gridloc, Color.Green);
+                }
+            }
 
+            if (playerGridPath != null)
+            {
+                for (int i = 0; i < playerGridPath.Length; i++)
+                {
+                    Rectangle gridloc = new Rectangle((int)playerGridPath[i].X * 64, (int)playerGridPath[i].Y * 64, 64, 64);
+                    if (gridLocation.ToVector2() != playerGridPath[i])
+                        spriteBatch.Draw(gridColor, gridloc, Color.Green);
+                    else
+                        spriteBatch.Draw(gridColor, gridloc, Color.GreenYellow);
+                }
+            }
             //torso.Draw(gameTime,spriteBatch);
             Rectangle dest = torso.physicsRectnagleObjRecToDraw();
             //dest.Height = dest.Height+(int)wheel.Size.Y/2;
             //dest.Y = dest.Y + (int)wheel.Size.Y/2;
             if (!torso.Body.IsDisposed && anim != null)
                 anim.Draw(spriteBatch, dest, torso.Body, false);
-            pv1.Draw(gameTime, spriteBatch);
-            pv2.Draw(gameTime, spriteBatch);
+            //pv1.Draw(gameTime, spriteBatch);
+            //pv2.Draw(gameTime, spriteBatch);
 
             if (isMeleAttacking && !(mele.Body.IsDisposed))
                 mele.Draw(gameTime, spriteBatch);
@@ -516,7 +667,7 @@ namespace RemGame
             //wheel.Draw(gameTime,spriteBatch);
 
             //////////////////////////////////////////FOR CHEACKING ENEMY INDICATORS OF SORRUNDING////////////////////////////////////
-            if (gridLocation.X > 5 && gridLocation.Y>5)
+            if (gridLocation.X > 5 && gridLocation.Y > 5)
             {
                 Console.WriteLine(gridLocation);
                 //Console.WriteLine("looking to the right:");
@@ -539,7 +690,8 @@ namespace RemGame
                     //Console.WriteLine("looking at index: " + (gridLocation.X - i) + " " + map.getGridObject(gridLocation.X - i, gridLocation.Y));
 
                 }
-                spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
+                spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
+                //spriteBatch.DrawString(font, this.playerDetected.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
 
             }
             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -548,13 +700,13 @@ namespace RemGame
         void UpdateAI()
         {
             int indexOfCollision;
-            bool reachedLeft=true, reachedRight = false;
+            bool reachedLeft = true, reachedRight = false;
+            /*
+                        Console.WriteLine("CollideLeft: " + collideLeft);
+                        Console.WriteLine("ColliderIGHT: " + collideRight);
+                        Console.WriteLine("playerdetected: " + playerDetected);
 
-            Console.WriteLine("CollideLeft: " + collideLeft);
-            Console.WriteLine("ColliderIGHT: " + collideRight);
-            Console.WriteLine("playerdetected: " + playerDetected);
-
-
+            */
             random = new Random();
             if (wheel.Body.LinearVelocity.Y != 0)
                 grounded = true;
@@ -571,15 +723,16 @@ namespace RemGame
                     else
                         playerDetected = false;
                 }
+                /*
                 Console.WriteLine();
                 Console.WriteLine("checking for collision right: ");
                 for (int i = 0; i <= 2; i++)
                 {
                     for (int j = 0; j <= 2; j++)
                     {
-                        Console.Write((map.getGridObject(gridLocation.X + i, gridLocation.Y)) + " ");                   
-                        Console.Write((map.getGridObject(gridLocation.X + i, gridLocation.Y + j)) + " ");
-                        Console.Write((map.getGridObject(gridLocation.X + i, gridLocation.Y - j)) + " ");
+                        Console.Write((map.getGridObject(gridLocation.X + j, gridLocation.Y)) + "at index: "+j+" "+i);                   
+                        Console.Write((map.getGridObject(gridLocation.X + j, gridLocation.Y + i)) + "at index: " + j + " " + i);
+                        Console.Write((map.getGridObject(gridLocation.X + j, gridLocation.Y - i)) + "at index: " + j + " " + i);
                         Console.WriteLine();
 
                     }
@@ -592,45 +745,45 @@ namespace RemGame
                     for (int j = 0; j <= 2; j++)
                     {
 
-                        Console.Write((map.getGridObject(gridLocation.X - i, gridLocation.Y)) + " ");
-                        Console.Write((map.getGridObject(gridLocation.X - i, gridLocation.Y + j)) + " ");
-                        Console.Write((map.getGridObject(gridLocation.X - i, gridLocation.Y - j)) + " ");
+                        Console.Write((map.getGridObject(gridLocation.X - j, gridLocation.Y)) + "at index: " + j + " " + i);
+                        Console.Write((map.getGridObject(gridLocation.X - j, gridLocation.Y + i)) + "at index: " + j + " " + i);
+                        Console.Write((map.getGridObject(gridLocation.X - j, gridLocation.Y - i)) + "at index: " + j + " " + i);
                         Console.WriteLine();
 
                     }
                 }
-
+                */
 
                 for (int i = 0; i <= 2; i++)
                 {
                     for (int j = 0; j <= 2; j++)
                     {
 
-                        if (!map.isPassable(gridLocation.X + i, gridLocation.Y) || !map.isPassable(gridLocation.X + i, gridLocation.Y + j)
-                            || !map.isPassable(gridLocation.X + i, gridLocation.Y - j))
+                        if (!map.isPassable(gridLocation.X + j, gridLocation.Y) || !map.isPassable(gridLocation.X + j, gridLocation.Y + i)
+                            || !map.isPassable(gridLocation.X + j, gridLocation.Y - i))
                         {
-                            if (map.getGridObject(gridLocation.X + i, gridLocation.Y + j) != 1 || map.getGridObject(gridLocation.X + i, gridLocation.Y - j) != 1)
+                            if (map.getGridObject(gridLocation.X + j, gridLocation.Y + i) != 1 || map.getGridObject(gridLocation.X + j, gridLocation.Y - i) != 1)
                                 collideRight = true;
 
-                            indexOfCollision = gridLocation.X + i;
+                            //indexOfCollision = gridLocation.X + i;
 
                         }
 
-                        if (!map.isPassable(gridLocation.X - i, gridLocation.Y) || !map.isPassable(gridLocation.X - i, gridLocation.Y + j)
-                            || !map.isPassable(gridLocation.X - i, gridLocation.Y - j))
+                        if (!map.isPassable(gridLocation.X - j, gridLocation.Y) || !map.isPassable(gridLocation.X - j, gridLocation.Y + i)
+                            || !map.isPassable(gridLocation.X - j, gridLocation.Y - i))
                         {
-                            if (map.getGridObject(gridLocation.X - i, gridLocation.Y + j) != 1 || map.getGridObject(gridLocation.X - i, gridLocation.Y - j) != 1)
+                            if (map.getGridObject(gridLocation.X - j, gridLocation.Y + i) != 1 || map.getGridObject(gridLocation.X - j, gridLocation.Y - i) != 1)
                                 collideLeft = true;
 
-                            indexOfCollision = gridLocation.X + i;
+                            //indexOfCollision = gridLocation.X + i;
                         }
                     }
                 }
-               
+
             }
             if (!playerDetected)
             {
-                
+
                 switch (mode)
                 {
                     case Mode.Idle:
@@ -650,7 +803,7 @@ namespace RemGame
                                 direction = Movement.Right;
                             }
 
-                            else if (true)
+                            else
                             {
                                 pingPong = true;
 
@@ -666,10 +819,7 @@ namespace RemGame
                                     pingPong = false;
 
                             }
-                            else
-                            {
-                                Move(Movement.Stop);
-                            }
+
                             collideLeft = false;
                             collideRight = false;
 
@@ -698,7 +848,7 @@ namespace RemGame
                              }
                              */
                         }
-                        
+
                         break;
                 }
             }
@@ -716,6 +866,49 @@ namespace RemGame
                         break;
                 }
             }
+        }
+
+        public Vector2[] findPathToPatrol()
+        {
+            Vector2[] arr;
+            path = PathFinder.FindPath(startLocationGrid.ToVector2(), new Vector2(startLocationGrid.X + 40, startLocationGrid.Y), "Euclidain");
+            if (path == null)
+                arr = new Vector2[] { gridLocation.ToVector2() };
+            //arr[0] = gridLocation.ToVector2();
+
+            else
+                arr = path.ToArray();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                //Console.WriteLine(arr[i]);
+            }
+            return arr;
+        }
+        public Vector2[] findPathToPlayer()
+        {
+            Vector2[] arr;
+            /*
+            if (gridLocation = startLocationGrid)
+                canFind = true;
+            if(canFind)
+            */
+            path = PathFinder.FindPath(gridLocation.ToVector2(), player.GridLocation.ToVector2(), "Manhattan");
+            if (path == null)
+                arr = new Vector2[] { gridLocation.ToVector2() };
+            //arr[0] = gridLocation.ToVector2();
+
+            else
+                arr = path.ToArray();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                //Console.WriteLine(arr[i]);
+            }
+            return arr;
+        }
+
+        public void setAstarsquare(Texture2D t)
+        {
+            gridColor = t;
         }
         /*
         private float GetRandomSpeed()
