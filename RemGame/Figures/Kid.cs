@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,7 +8,6 @@ using FarseerPhysics.Dynamics;
 using FarseerPhysics.Factories;
 using FarseerPhysics.Dynamics.Joints;
 using FarseerPhysics.Dynamics.Contacts;
-using FarseerPhysics.Collision;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Audio;
 
@@ -931,9 +926,9 @@ namespace RemGame
 
                 //spriteBatch.DrawString(f, Position.X +" /"+Position.Y, new Vector2(Position.X + size.X, Position.Y+30), Color.White);
 
-                //pv1.Draw(gameTime, spriteBatch);
-                //pv2.Draw(gameTime, spriteBatch);
-                //pv3.Draw(gameTime, spriteBatch);
+                pv1.Draw(gameTime, spriteBatch);
+                pv2.Draw(gameTime, spriteBatch);
+                pv3.Draw(gameTime, spriteBatch);
 
             }
             else
@@ -944,9 +939,9 @@ namespace RemGame
 
             }
             //debbuging
-            spriteBatch.DrawString(f, isFalling.ToString(), new Vector2(Position.X + size.X, Position.Y + 20), Color.White);
-            if (map != null)
-                spriteBatch.DrawString(f, "tile : " + map.getGridObject(gridLocation.X, gridLocation.Y + 3), new Vector2(Position.X + size.X, Position.Y + 40), Color.White);
+           // spriteBatch.DrawString(f, isFalling.ToString(), new Vector2(Position.X + size.X, Position.Y + 20), Color.White);
+            //if (map != null)
+              //  spriteBatch.DrawString(f, "tile : " + map.getGridObject(gridLocation.X, gridLocation.Y + 3), new Vector2(Position.X + size.X, Position.Y + 40), Color.White);
 
 
         }
