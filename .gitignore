@@ -2,6 +2,8 @@
 .vs/
 RemGame/bin
 RemGame/obj
+RemGame/Content/obj
+RemGame/Content/bin
 Util/bin
 Util/obj
 Farseer/bin
