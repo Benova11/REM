@@ -27,7 +27,7 @@ namespace RemGame
         public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
         private int itrator = 0;
         private bool colorPicked = false;
-
+        private bool isAlive = true;
         Random random;
 
         private int playerDistanceToAttack;
@@ -91,6 +91,9 @@ namespace RemGame
         private DateTime previousWander = DateTime.Now;   // time at which we previously jumped
         private const float wanderInterval = 3.0f;
 
+        private DateTime evaded = DateTime.Now;   // time at which we previously jumped
+        private bool dissapear = false;
+
         private bool endOfPatrol = false;
 
         private bool wandered = true;
@@ -101,7 +104,7 @@ namespace RemGame
 
         private DateTime previousJump = DateTime.Now;   // time at which we previously jumped
         private const float jumpInterval = 0.7f;        // in seconds
-        private Vector2 jumpForce = new Vector2(0, -5); // applied force when jumping
+        private Vector2 jumpForce = new Vector2(0, -6); // applied force when jumping
 
         private DateTime previousSlide = DateTime.Now;   // time at which we previously jumped
         private const float slideInterval = 0.1f;        // in seconds
@@ -280,9 +283,9 @@ namespace RemGame
             {
                 isMeleAttacking = true;
 
-                if (lookingRight)
+                if (lookingRight && anim != Animations[2])
                     anim = Animations[2];
-                else
+                else if(anim != animations[3])
                     anim = animations[3];
 
                 mele = new PhysicsObject(world, shootTexture, 5, 1);
@@ -301,8 +304,7 @@ namespace RemGame
 
                 mele.Body.ApplyLinearImpulse(new Vector2(10 * dir, 0));
 
-                if (isPlayerAlive)
-                    mele.Body.OnCollision += new OnCollisionEventHandler(Mele_OnCollision);
+                mele.Body.OnCollision += new OnCollisionEventHandler(Mele_OnCollision);
                 previousShoot = DateTime.Now;
                 
             }
@@ -315,7 +317,6 @@ namespace RemGame
         bool Mele_OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
         {
 
-            isMeleAttacking = false;
             mele.Body.Dispose();
             return true;
 
@@ -331,8 +332,12 @@ namespace RemGame
                 }
                 else
                 {
+                    isAlive = false;
                     torso.Body.Dispose();
+                    midBody.Body.Dispose();
                     wheel.Body.Dispose();
+                    tail1.Body.Dispose();
+                    tail2.Body.Dispose();
 
                 }
                 return true;
@@ -351,36 +356,48 @@ namespace RemGame
 
         public override void Update(GameTime gameTime, Vector2 playerPosition, bool PlayerAlive, int patrolbound)
         {
+            if (isAlive)
+            {
+                bool reached = false;
 
-            bool reached = false;
+                if (gridLocation == startLocationGrid)
+                    PathFinder.SetMap(map);
 
-            if (gridLocation == startLocationGrid)
-                PathFinder.SetMap(map);
+                if (anim != null)
+                {
+                    if (anim.IsLooped)
+                    {
+                        isMeleAttacking = false;
+                        anim.IsLooped = false;
+                    }
+                }
 
-            if(!isMeleAttacking)
-                anim = Animations[(int)direction];
+                if (!isMeleAttacking)
+                    anim = Animations[(int)direction];
 
-            UpdateAI();
+                
+
+                UpdateAI();
 
 
-           // if (isMoving || direction == Movement.Stop) // apply animation
+                // if (isMoving || direction == Movement.Stop) // apply animation
                 Anim.Update(gameTime);
-           // else //player will appear as standing with frame [1] from the atlas.
-             //   Anim.CurrentFrame = 1;
+                // else //player will appear as standing with frame [1] from the atlas.
+                //   Anim.CurrentFrame = 1;
 
-            if (direction == Movement.Right)
-            {
-                tail2.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
-                tail1.Body.CollidesWith = Category.None;
+                if (direction == Movement.Right)
+                {
+                    tail2.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
+                    tail1.Body.CollidesWith = Category.None;
+                }
+
+                else
+                {
+                    tail1.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
+                    tail2.Body.CollidesWith = Category.None;
+                }
+
             }
-
-            else 
-            {
-                tail1.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
-                tail2.Body.CollidesWith = Category.None;
-            }
-
-
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, SpriteFont font)
@@ -415,7 +432,7 @@ namespace RemGame
                         x = 1;
                 }
                 //DRAWS A* PATH
-                /*
+                
                 for (int i = 0; i < patrolGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)patrolGridPath[i].X * 64, (int)patrolGridPath[i].Y * 64, 64, 64);
@@ -424,14 +441,14 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.Green);
                 }
-                */
+                
             }
 
             //dRAWS PATH TO PLAYER
-            
+            /*
             if (playerGridPath != null)
             {
-                /*
+                
                 for (int i = 0; i < playerGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)playerGridPath[i].X * 64, (int)playerGridPath[i].Y * 64, 40, 40);
@@ -440,29 +457,29 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.GreenYellow);
                 }
-                */
+                
             }
-            
+            */
             //torso.Draw(gameTime,spriteBatch);
             Rectangle dest = torso.physicsRectnagleObjRecToDraw();
             //dest.Height = dest.Height+(int)wheel.Size.Y/2;
             //dest.Y = dest.Y + (int)wheel.Size.Y/2;
-            if (!torso.Body.IsDisposed && anim != null && lookingRight)
+            if (!torso.Body.IsDisposed && anim != null && lookingRight && !dissapear)
                 anim.Draw(spriteBatch, dest, torso.Body, true);
-            if (!torso.Body.IsDisposed && anim != null && !lookingRight)
+            if (!torso.Body.IsDisposed && anim != null && !lookingRight && !dissapear)
                 anim.Draw(spriteBatch, dest, torso.Body, false);
             
 
 
-            //pv1.Draw(gameTime, spriteBatch);
-            //pv2.Draw(gameTime, spriteBatch);
-            //pv3.Draw(gameTime, spriteBatch);
-            //pv4.Draw(gameTime, spriteBatch);
-            //pv5.Draw(gameTime, spriteBatch);
+            pv1.Draw(gameTime, spriteBatch);
+            pv2.Draw(gameTime, spriteBatch);
+            pv3.Draw(gameTime, spriteBatch);
+            pv4.Draw(gameTime, spriteBatch);
+            pv5.Draw(gameTime, spriteBatch);
 
 
 
-            if (isMeleAttacking && !(mele.Body.IsDisposed))
+            if (mele!=null && !(mele.Body.IsDisposed))
                 mele.Draw(gameTime, spriteBatch);
 
             //wheel.Draw(gameTime,spriteBatch);
@@ -475,7 +492,7 @@ namespace RemGame
             //spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
             //spriteBatch.DrawString(font, this.position.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
-            spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
+            //spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
         }
 
         public void UpdateAI()
@@ -493,43 +510,46 @@ namespace RemGame
             if (playerGridPath == null)
                 playerGridPath = new Vector2[] { gridLocation.ToVector2() };
 
-
-            if ((playerGridPath.Length < 10 && playerGridPath.Length > 1))//sight range
+            if (mode != Mode.Evade)
             {
-                if (playerGridPath.Length < 6) //attack range                
-                    mode = Mode.Attack;
-
-                else if(mode != Mode.WalkToPlayer)
-                    mode = Mode.WalkToPlayer;
-            }
-
-            else
-            {
-                if (endOfPatrol)
+                if ((playerGridPath.Length < 10 && playerGridPath.Length > 1))//sight range
                 {
-                    if (mode != Mode.Idle)
-                        mode = Mode.Idle;
 
-                    if ((DateTime.Now - previousWander).TotalSeconds >= wanderInterval)
+                    if (playerGridPath.Length < 6) //attack range                
+                        mode = Mode.Attack;
+
+                    else if (mode != Mode.WalkToPlayer)
+                        mode = Mode.WalkToPlayer;
+
+                }
+
+                else
+                {
+                    if (endOfPatrol)
                     {
-                        itrator = 0;
-                        endOfPatrol = false;
-                        wandered = true;
+                        if (mode != Mode.Idle)
+                            mode = Mode.Idle;
+
+                        if ((DateTime.Now - previousWander).TotalSeconds >= wanderInterval)
+                        {
+                            itrator = 0;
+                            endOfPatrol = false;
+                            wandered = true;
+                        }
                     }
+
+                    else if (mode != Mode.Patrol)
+                    {
+                        if (mode == Mode.WalkToPlayer)
+                            itrator = 0;
+                        mode = Mode.Patrol;
+
+                    }
+
                 }
 
-                else if (mode != Mode.Patrol)
-                {
-                    if (mode == Mode.WalkToPlayer)
-                        itrator = 0;
-                    mode = Mode.Patrol;
-
-                }
-
+                patrolDirection *= -1;
             }
-
-            patrolDirection *= -1;
-
             //condition needts to change by enemies abilities like attack up or down etc...           
             //if (playerGridPath.Length > 2)//if player not in range do: patrol idle,else do : attack,walktoplayer,evade
             //{            //}
@@ -590,18 +610,37 @@ namespace RemGame
                     else if(player.Position.X < Position.X && lookingRight)
                         Move(Movement.Left);
                     Move(Movement.Stop);
-                    meleAttack();
-                    /*
+                    if(IsPlayerAlive)
+                        meleAttack();
+                    
                     random = new Random();
                     double randomInterval = (random.NextDouble() * 10 + 1);
-                    if (randomInterval < 5)
+                    if (randomInterval < 4 && (DateTime.Now - evaded).TotalSeconds > 8)
+                    {
                         mode = Mode.Evade;
-                    */
-                        break;
+                        evaded = DateTime.Now;                     
+
+                    }
+
+                    break;
 
                 case Mode.Evade:
-                    Vector2 newPosition = new Vector2(Position.X + 200, Position.Y);
-                    //torso.Body.SetTransformIgnoreContacts(ref newPosition, 0);
+
+                    dissapear = true;
+
+                    if (player.Position.X > Position.X-200)
+                        Move(Movement.Right);
+
+                    if (player.Position.X < Position.X +200)
+                        Move(Movement.Left);
+
+                    if ((DateTime.Now - evaded).TotalSeconds > 4)
+                    {
+                        dissapear = false;
+                        mode = Mode.WalkToPlayer;
+
+                    }
+                    
                     break;
 
                 default:
@@ -632,9 +671,7 @@ namespace RemGame
 
                     if (selectedPath[itrator + 1].Y < gridLocation.Y)
                     {
-                        wheel.Body.ApplyLinearImpulse(new Vector2(0, -6));
-                        isMoving = false;
-
+                        mode = Mode.Idle;
                     }
 
                     itrator++;
@@ -642,7 +679,7 @@ namespace RemGame
                 }
 
             }
-            else
+            else if(mode != Mode.Evade)
             {
                 Move(Movement.Stop);
                 isMoving = false;

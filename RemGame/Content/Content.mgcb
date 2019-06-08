@@ -339,6 +339,18 @@
 /processorParam:TextureFormat=Color
 /build:Player/Anim/Ron_Melee_Yoyo.png
 
+#begin Player/Anim/Ron_Ranged_Scissors.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/Anim/Ron_Ranged_Scissors.png
+
 #begin Player/Anim/Ron_Stand.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -362,6 +374,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Player/Anim/Ron_Walk.png
+
+#begin Player/Anim/Scissors_Open.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/Anim/Scissors_Open.png
 
 #begin Player/Anim/Slide/Ron_Slide_01_start.png
 /importer:TextureImporter

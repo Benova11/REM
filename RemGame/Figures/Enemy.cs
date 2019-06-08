@@ -32,7 +32,7 @@ namespace RemGame
         protected Vector2 position;
         protected Point gridLocation;
 
-        protected bool isPlayerAlive;
+        private bool isPlayerAlive;
         protected bool isMoving;
         protected bool isAttacking;
 
@@ -61,7 +61,6 @@ namespace RemGame
 
             
             isMoving = false;
-            isPlayerAlive = true;
             IsAttacking = false;
 
         }
@@ -71,8 +70,7 @@ namespace RemGame
         public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
         public Point GridLocation { get => gridLocation; set => gridLocation = value; }
         public virtual Vector2 Position { get => position;}
-
-
+        protected bool IsPlayerAlive { get => player.IsAlive; }
 
         public virtual void Update(GameTime gameTime, Vector2 playerPosition, bool PlayerAlive, int patrolbound)
         {

@@ -11,12 +11,14 @@ namespace RemGame
         private double timer;
         private double speed;
         private Rectangle scale;
+        private bool isLooped;
         SpriteEffects flip = SpriteEffects.FlipHorizontally;
 
         public Texture2D Texture { get; set; }
         public int Rows { get; set; }
         public int Columns { get; set; }
         public int CurrentFrame { get => currentFrame; set => currentFrame = value; }
+        public bool IsLooped { get => isLooped; set => isLooped = value; }
 
         public AnimatedSprite(Texture2D texture, int rows, int columns,Rectangle scale, float rate)
         {
@@ -28,7 +30,7 @@ namespace RemGame
             speed = rate;
             timer = speed;
             this.scale = scale;
-
+            IsLooped = false;
 
         }
 
@@ -41,7 +43,10 @@ namespace RemGame
                 timer = speed;
             }
             if (CurrentFrame == totalFrames)
+            {
                 CurrentFrame = 0;
+                IsLooped = true;
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, Rectangle destination,Body body,bool toLeft)
@@ -65,5 +70,6 @@ namespace RemGame
 
 
         }
+        
     }
 }
