@@ -432,7 +432,7 @@ namespace RemGame
                         x = 1;
                 }
                 //DRAWS A* PATH
-                
+                /*
                 for (int i = 0; i < patrolGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)patrolGridPath[i].X * 64, (int)patrolGridPath[i].Y * 64, 64, 64);
@@ -441,11 +441,11 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.Green);
                 }
-                
+               */ 
             }
 
             //dRAWS PATH TO PLAYER
-            /*
+            
             if (playerGridPath != null)
             {
                 
@@ -459,7 +459,7 @@ namespace RemGame
                 }
                 
             }
-            */
+            
             //torso.Draw(gameTime,spriteBatch);
             Rectangle dest = torso.physicsRectnagleObjRecToDraw();
             //dest.Height = dest.Height+(int)wheel.Size.Y/2;

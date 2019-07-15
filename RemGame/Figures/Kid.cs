@@ -863,7 +863,7 @@ namespace RemGame
                     shootBase = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
                     Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X), (shootDirection.Y - shootBase.Y));
                     if (shootForce.X > 5 || shootForce.X < -5 || shootForce.Y > 5 || shootForce.Y < -5)
-                        rangedShoot(shootForce * 4);
+                        rangedShoot(shootForce * 3);
                 }
 
                 ///Sraight Shot / might change to Mele

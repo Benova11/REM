@@ -157,7 +157,7 @@ namespace RemGame
 
 
                     }
-                    else if (number == 8)//enemy
+                    else if (number == 8)//Principal
                     {
                         Point startLocationGrid = new Point(x, y+2);
                         r = new Random();
@@ -180,7 +180,22 @@ namespace RemGame
                             passableDict.Add(9, obs2.Passable);
 
                     }
-           
+
+                    else if (number == 10)//groundedEnemey
+                    {
+                        Point startLocationGrid = new Point(x, y);
+                        r = new Random();
+                        int rInt = r.Next(192, 320);
+                        Enemy en = new groundedEnemy(world, this, player, 5,
+                        new Vector2(60, 60),
+                        100, 0.5f,
+                        new Vector2(x * 64 + size / 2, y * 64), startLocationGrid, font, 10, rInt, 5, 5, 5, 5);
+                        en.setAstarsquare(texture);
+                        en.GridLocation = startLocationGrid;
+                        Enemies.Add(en);
+
+                    }
+
 
 
                     width = (x + 1) * size;
