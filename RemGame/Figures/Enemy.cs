@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using FarseerPhysics.Dynamics;
 using Microsoft.Xna.Framework.Content;
+using System;
 
 namespace RemGame
 {
@@ -30,7 +31,9 @@ namespace RemGame
         protected float evasionLuck;
 
         protected Vector2 position;
+        protected Vector2 previousPosition;
         protected Point gridLocation;
+
 
         private bool isPlayerAlive;
         protected bool isMoving;
@@ -143,6 +146,18 @@ namespace RemGame
         public virtual void setAstarsquare(Texture2D t)
         {
             gridColor = t;
+        }
+
+        protected bool checkIfStuck()
+        {
+            Console.WriteLine("pre" + previousPosition);
+            Console.WriteLine( Position);
+
+            if (Math.Abs(previousPosition.X - Position.X) < 0.1 )
+                return true;
+            else
+                return false;
+            
         }
 
  

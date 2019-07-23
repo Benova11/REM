@@ -20,6 +20,7 @@ namespace RemGame
 
         public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
         private int itrator = 0;
+
         private bool colorPicked = false;
         private bool isAlive = true;
         Random random;
@@ -105,6 +106,9 @@ namespace RemGame
 
         private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
         private const float shootInterval = 3.0f;        // in seconds
+
+        private DateTime previousStuckCheck = DateTime.Now;   // time at which we previously jumped
+        private const float stuckCheckInterval = 1.5f;
 
         private AnimatedSprite anim;
         private AnimatedSprite[] animations = new AnimatedSprite[6];
@@ -420,13 +424,14 @@ namespace RemGame
 
             //wheel.Draw(gameTime,spriteBatch);
 
-            //spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
+            spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
             //if (selectedPath != null)
             //  spriteBatch.DrawString(font, selectedPath[selectedPath.Length - 1].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
 
-            //spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
-            //spriteBatch.DrawString(font, this.position.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
+            spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64), Color.White);
+            if (selectedPath != null)
+                spriteBatch.DrawString(font, selectedPath[itrator].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
             //spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
         }
@@ -479,7 +484,7 @@ namespace RemGame
                         if (mode == Mode.WalkToPlayer)
                             itrator = 0;
                         mode = Mode.Patrol;
-
+                        
                     }
 
                 }
@@ -499,7 +504,27 @@ namespace RemGame
 
                 case Mode.Patrol:
 
-                    if (itrator == 0 && wandered)
+                    if (patrolGridPath != null)
+                    {
+                        if (patrolGridPath.Length == 1)
+                        {
+                            itrator = 0;
+                            wandered = true;
+                        }
+                        /*
+                        if ((DateTime.Now - previousStuckCheck).TotalSeconds >= stuckCheckInterval && mode != Mode.Idle)
+                        {
+                            if (checkIfStuck())
+                            {
+                                itrator = 0;
+                                wandered = true;
+                                previousStuckCheck = DateTime.Now;
+                            }
+                        }
+                        */
+                    }
+
+                    if ((itrator == 0 && wandered) )
                     {
                         patrolGridPath = findPathToPatrol(patrolDirection * 20);
                         selectedPath = patrolGridPath;
@@ -607,13 +632,48 @@ namespace RemGame
 
                     if (selectedPath[itrator + 1].Y < gridLocation.Y)
                     {
+
                         wheel.Body.ApplyLinearImpulse(new Vector2(0, -4));
 
                     }
-
-                    itrator++;
-
+                    //itrator++;
+                    /*
+                    if (itrator != 0)
+                        itrator = Math.Abs(gridLocation.X - (int)selectedPath[0].X);
+                    else
+                    */
+                        itrator++;
                 }
+
+                /*
+                else
+                {
+                    int gridToAdjust = Math.Abs(gridLocation.X - (int)selectedPath[selectedPath.Length - 1].X);
+
+                    if(direction == Movement.Right && gridLocation.X > selectedPath[itrator].X)
+                    {
+                        if (gridLocation.X > selectedPath[selectedPath.Length - 1].X)
+                        {
+                            itrator = 0;
+                        }
+                        else
+                            itrator = gridLocation.X - (int)selectedPath[0].X;
+                    }
+
+                    if (direction == Movement.Left && gridLocation.X < selectedPath[itrator].X)
+                    {
+                        if (gridLocation.X < selectedPath[selectedPath.Length - 1].X)
+                        {
+                            itrator = 0;
+                        }
+                        else
+                            itrator = (int)selectedPath[0].X - gridLocation.X;
+                    }
+                }
+                */
+               
+                    previousPosition = Position;
+                
 
             }
             else if (mode != Mode.Evade)
@@ -697,7 +757,7 @@ namespace RemGame
 
 
             Vector2[] arr;
-            path = PathFinder.FindPath(gridLocation.ToVector2(), new Vector2(gridLocation.X + maxDestanationValue, gridLocation.Y), "Euclidain");
+            path = PathFinder.FindPath(gridLocation.ToVector2(), new Vector2(gridLocation.X + maxDestanationValue, gridLocation.Y), "Manhattan");
             if (path == null)
                 arr = new Vector2[] { gridLocation.ToVector2() };
             else
