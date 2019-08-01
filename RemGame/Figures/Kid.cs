@@ -34,6 +34,9 @@ namespace RemGame
         RangedAttackLeft
     }
 
+    public enum playerMode { Idle, Walking, Attacking}// what mode of behavior the monster AI is using 
+
+
     class Kid : Component
     {
         private static ContentManager content;
@@ -55,8 +58,6 @@ namespace RemGame
         PhysicsView pv1;
         PhysicsView pv2;
         PhysicsView pv3;
-
-
 
         private PhysicsObject upBody;
         private PhysicsObject midBody;
@@ -85,10 +86,9 @@ namespace RemGame
 
         private int health = 30;
         private bool isAlive = true;
+        private playerMode mode = playerMode.Idle;
 
         private const float SPEED = 2.0f;
-
-
         private float speed = SPEED;
         private float actualMovningSpeed = 0;
 
@@ -193,6 +193,7 @@ namespace RemGame
         public Vector2 CameraToFollow { get => cameraToFollow; set => cameraToFollow = value; }
         public HealthBar HealthBar { get => health_bar; set => health_bar = value; }
         public Point GridLocation { get => gridLocation; set => gridLocation = value; }
+        public playerMode Mode { get => mode; set => mode = value; }
 
         public Kid(Camera2D cam, World world, Vector2 size, float mass, Vector2 startPosition, bool isBent, SpriteFont f)
         {
@@ -369,6 +370,7 @@ namespace RemGame
                 switch (movement)
                 {
                     case Movement.Left:
+                        mode = playerMode.Walking;
 
                         lookRight = false;
                         axis1.MotorSpeed = -MathHelper.TwoPi * speed;
@@ -376,6 +378,7 @@ namespace RemGame
                         break;
 
                     case Movement.Right:
+                        mode = playerMode.Walking;
 
                         lookRight = true;
                         axis1.MotorSpeed = MathHelper.TwoPi * speed;
@@ -383,6 +386,8 @@ namespace RemGame
                         break;
 
                     case Movement.Stop:
+                        mode = playerMode.Idle;
+
                         axis1.MotorSpeed = 0;
                         //axis1.MotorEnabled = false;                       
                         if (!isFalling)
@@ -477,7 +482,7 @@ namespace RemGame
         {
             if ((DateTime.Now - previousShoot).TotalSeconds >= shootInterval)
             {
-
+                mode = playerMode.Attacking;
                 isMeleAttacking = true;
                 reachedDest = false;//check for keft direction
                 shot = new PhysicsObject(world, yoyoTexture, 15, 1);
@@ -531,7 +536,7 @@ namespace RemGame
         {
             if ((DateTime.Now - previousRangedShoot).TotalSeconds >= shootInterval)
             {
-
+                mode = playerMode.Attacking;
                 isRangeAttacking = true;
                 rangedShot = new PhysicsObject(world, scissorsTexture, 15, 1);
                 rangedShot.Body.CollisionCategories = Category.Cat28;
@@ -840,7 +845,7 @@ namespace RemGame
                 {
                     bend();
                     IsBending = true;
-
+                    
                 }
                 ///Check for leaving bend pose
                 if (keyboardState.IsKeyUp(Keys.S) && prevKeyboardState.IsKeyDown(Keys.S))
@@ -864,6 +869,7 @@ namespace RemGame
                     Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X), (shootDirection.Y - shootBase.Y));
                     if (shootForce.X > 5 || shootForce.X < -5 || shootForce.Y > 5 || shootForce.Y < -5)
                         rangedShoot(shootForce * 3);
+
                 }
 
                 ///Sraight Shot / might change to Mele
@@ -871,6 +877,7 @@ namespace RemGame
 
                 {
                     Shoot();
+
                 }
 
                 ///////////////////////////////////////////////////////////////Sound Effects///////////////////////////////////////////////////////////////////

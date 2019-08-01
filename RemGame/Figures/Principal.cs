@@ -13,13 +13,7 @@ using Microsoft.Xna.Framework.Content;
 namespace RemGame
 {
 
-    enum Movement
-    {
-        Left,
-        Right,
-        Jump,
-        Stop
-    }
+    
 
     class Principal:Enemy
     {
@@ -326,9 +320,9 @@ namespace RemGame
         {
             if (fixtureB.CollisionCategories == Category.Cat28)
             {
-                if (health > 0)
+                if (Health > 0)
                 {
-                    health--;
+                    Health--;
                 }
                 else
                 {

@@ -7,9 +7,18 @@ using System;
 
 namespace RemGame
 {
-  
-     class Enemy
+    enum Movement
     {
+        Left,
+        Right,
+        Jump,
+        Stop
+    }
+
+    class Enemy
+    {
+        public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
+
         protected static int x = 1;
 
         protected static ContentManager content;
@@ -21,6 +30,9 @@ namespace RemGame
         protected Map map;
         protected Kid player;
 
+        protected String decision;
+
+        protected int startinghealth;
         protected int health;
         protected Vector2 size;
         protected float mass;
@@ -39,8 +51,11 @@ namespace RemGame
         protected bool isMoving;
         protected bool isAttacking;
 
+        protected Vector2[] patrolGridPath;
+        protected Vector2[] playerGridPath;
+
         protected List<Vector2> path;///protection type needed
-       
+
         protected Vector2[] selectedPath;
 
         Texture2D shootTexture;
@@ -48,21 +63,21 @@ namespace RemGame
         protected Texture2D gridColor;
 
 
-        public Enemy(World world, Map map, Kid player,int health, Vector2 size, float mass, float speed, Point startLocationGrid, SpriteFont f)
+        public Enemy(World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Point startLocationGrid, SpriteFont f)
         {
-
+            
             this.world = world;
             this.map = map;
             this.player = player;
 
-            this.health = health;
+            this.startinghealth = health;
+            this.Health = health;
             this.size = size;
             this.mass = mass / 2.0f;
             this.speed = speed;
-            
+
             this.startLocationGrid = startLocationGrid;
 
-            
             isMoving = false;
             IsAttacking = false;
 
@@ -72,8 +87,12 @@ namespace RemGame
         public static ContentManager Content { protected get => content; set => content = value; }
         public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
         public Point GridLocation { get => gridLocation; set => gridLocation = value; }
-        public virtual Vector2 Position { get => position;}
-        protected bool IsPlayerAlive { get => player.IsAlive; }
+        public virtual Vector2 Position { get => position; }
+        public bool IsPlayerAlive { get => player.IsAlive; }
+        public int Startinghealth { get => startinghealth;}
+        protected string Decision { get => decision; set => decision = value; }
+        public Vector2[] PatrolGridPath { get => patrolGridPath; set => patrolGridPath = value; }
+        public Vector2[] PlayerGridPath { get => playerGridPath; set => playerGridPath = value; }
 
         public virtual void Update(GameTime gameTime, Vector2 playerPosition, bool PlayerAlive, int patrolbound)
         {
@@ -126,7 +145,7 @@ namespace RemGame
             //spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
             //spriteBatch.DrawString(font, "IM HERE", new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
-           
+
         }
 
 
@@ -151,16 +170,18 @@ namespace RemGame
         protected bool checkIfStuck()
         {
             Console.WriteLine("pre" + previousPosition);
-            Console.WriteLine( Position);
+            Console.WriteLine(Position);
 
-            if (Math.Abs(previousPosition.X - Position.X) < 0.1 )
+            if (Math.Abs(previousPosition.X - Position.X) < 0.1)
                 return true;
             else
                 return false;
-            
+
         }
 
- 
+        
+
+
         /*
         private float GetRandomSpeed()
         {
@@ -170,5 +191,10 @@ namespace RemGame
             return x;
         }
         */
+
+
+
     }
 }
+
+
