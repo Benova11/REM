@@ -57,6 +57,9 @@
     <Compile Include="States\GameOverState.cs" />
     <Compile Include="States\GameStateInterfaces.cs" />
     <Compile Include="LevelDesgin\Map.cs" />
+    <Compile Include="Utils\Decision.cs" />
+    <Compile Include="Utils\DecisionQuery .cs" />
+    <Compile Include="Utils\DecisionResult.cs" />
     <Compile Include="Utils\PathFinder.cs" />
     <Compile Include="Utils\PathNode.cs" />
     <Compile Include="Utils\ScrollingBackground.cs" />

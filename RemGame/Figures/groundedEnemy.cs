@@ -13,13 +13,11 @@ using Microsoft.Xna.Framework.Content;
 namespace RemGame
 {
 
-   
-
     class groundedEnemy : Enemy
     {
 
-        public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
         private int itrator = 0;
+
         private bool colorPicked = false;
         private bool isAlive = true;
         Random random;
@@ -75,8 +73,7 @@ namespace RemGame
         private int patrolRange;
 
 
-        private Vector2[] patrolGridPath;
-        private Vector2[] playerGridPath;
+        
 
 
         private int patrolDirection = 1;
@@ -105,6 +102,9 @@ namespace RemGame
 
         private DateTime previousShoot = DateTime.Now;   // time at which we previously jumped
         private const float shootInterval = 3.0f;        // in seconds
+
+        private DateTime previousStuckCheck = DateTime.Now;   // time at which we previously jumped
+        private const float stuckCheckInterval = 1.5f;
 
         private AnimatedSprite anim;
         private AnimatedSprite[] animations = new AnimatedSprite[6];
@@ -277,9 +277,9 @@ namespace RemGame
         {
             if (fixtureB.CollisionCategories == Category.Cat28)
             {
-                if (health > 0)
+                if (Health > 0)
                 {
-                    health--;
+                    Health--;
                 }
                 else
                 {
@@ -307,6 +307,7 @@ namespace RemGame
         {
             if (isAlive)
             {
+
                 bool reached = false;
 
                 if (gridLocation == startLocationGrid)
@@ -344,7 +345,7 @@ namespace RemGame
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, SpriteFont font)
         {
 
-            if (patrolGridPath != null)
+            if (PatrolGridPath != null)
             {
                 Color c = Color.Red;
 
@@ -374,10 +375,10 @@ namespace RemGame
                 }
                 //DRAWS A* PATH
                 
-                for (int i = 0; i < patrolGridPath.Length; i++)
+                for (int i = 0; i < PatrolGridPath.Length; i++)
                 {
-                    Rectangle gridloc = new Rectangle((int)patrolGridPath[i].X * 64, (int)patrolGridPath[i].Y * 64, 64, 64);
-                    if (gridLocation.ToVector2() != patrolGridPath[i])
+                    Rectangle gridloc = new Rectangle((int)PatrolGridPath[i].X * 64, (int)PatrolGridPath[i].Y * 64, 64, 64);
+                    if (gridLocation.ToVector2() != PatrolGridPath[i])
                         spriteBatch.Draw(shootTexture, gridloc, c);
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.Green);
@@ -387,9 +388,9 @@ namespace RemGame
 
             //dRAWS PATH TO PLAYER
 
-            if (playerGridPath != null)
+            if (PlayerGridPath != null)
             {
-                /*
+                
                 for (int i = 0; i < playerGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)playerGridPath[i].X * 64, (int)playerGridPath[i].Y * 64, 40, 40);
@@ -398,7 +399,7 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.GreenYellow);
                 }
-                */
+                
             }
 
             //torso.Draw(gameTime,spriteBatch);
@@ -420,15 +421,16 @@ namespace RemGame
 
             //wheel.Draw(gameTime,spriteBatch);
 
-            //spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
-            //if (selectedPath != null)
-            //  spriteBatch.DrawString(font, selectedPath[selectedPath.Length - 1].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
+            spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
+            if(selectedPath != null)
+              spriteBatch.DrawString(font, selectedPath[selectedPath.Length - 1].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
 
-            //spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
-            //spriteBatch.DrawString(font, this.position.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
+            spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64), Color.White);
+            if (selectedPath != null)
+                spriteBatch.DrawString(font, selectedPath[itrator].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
-            //spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
+            spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
         }
 
         public void UpdateAI()
@@ -440,23 +442,30 @@ namespace RemGame
             //Borders for chcking path to the player,to reduce calculations
             if ((player.GridLocation.X < GridLocation.X + 50 && player.GridLocation.X > GridLocation.X - 50) && (player.GridLocation.Y > 0) && player.GridLocation != null)
             {
-               // playerGridPath = findPathToPlayer();
+               playerGridPath = findPathToPlayer();
+
             }
 
-            if (playerGridPath == null)
-                playerGridPath = new Vector2[] { gridLocation.ToVector2() };
-
-            if (mode != Mode.Evade)
-            {
-                if ((playerGridPath.Length < 10 && playerGridPath.Length > 1))//sight range
+            if (PlayerGridPath == null)
+                PlayerGridPath = new Vector2[] { gridLocation.ToVector2() };
+         
+                if ((PlayerGridPath.Length < 10 && PlayerGridPath.Length > 1))//sight range
                 {
 
-                    if (playerGridPath.Length < 6) //attack range                
-                        mode = Mode.Attack;
+                var trunk = MainDecisionTree();
+                decision = trunk.Evaluate(this);
+                Console.WriteLine(decision);
+                Console.WriteLine(Health);
 
-                    else if (mode != Mode.WalkToPlayer)
-                        mode = Mode.WalkToPlayer;
+                if (decision == "Attack") //attack range                
+                    mode = Mode.Attack;
 
+                else if (decision == "Evade")
+                    mode = Mode.Evade;
+
+                else if (mode != Mode.WalkToPlayer)
+                    mode = Mode.WalkToPlayer;
+   
                 }
 
                 else
@@ -479,13 +488,13 @@ namespace RemGame
                         if (mode == Mode.WalkToPlayer)
                             itrator = 0;
                         mode = Mode.Patrol;
-
+                        
                     }
 
                 }
 
                 patrolDirection *= -1;
-            }
+            
             //condition needts to change by enemies abilities like attack up or down etc...           
             //if (playerGridPath.Length > 2)//if player not in range do: patrol idle,else do : attack,walktoplayer,evade
             //{            //}
@@ -499,10 +508,30 @@ namespace RemGame
 
                 case Mode.Patrol:
 
-                    if (itrator == 0 && wandered)
+                    if (PatrolGridPath != null)
                     {
-                        patrolGridPath = findPathToPatrol(patrolDirection * 20);
-                        selectedPath = patrolGridPath;
+                        if (PatrolGridPath.Length == 1)
+                        {
+                            itrator = 0;
+                            wandered = true;
+                        }
+                        /*
+                        if ((DateTime.Now - previousStuckCheck).TotalSeconds >= stuckCheckInterval && mode != Mode.Idle)
+                        {
+                            if (checkIfStuck())
+                            {
+                                itrator = 0;
+                                wandered = true;
+                                previousStuckCheck = DateTime.Now;
+                            }
+                        }
+                        */
+                    }
+
+                    if ((itrator == 0 && wandered) )
+                    {
+                        PatrolGridPath = findPathToPatrol(patrolDirection * 20);
+                        selectedPath = PatrolGridPath;
                         endOfPatrol = false;
 
                     }
@@ -517,7 +546,7 @@ namespace RemGame
 
                 case Mode.WalkToPlayer:
                     itrator = 0;
-                    selectedPath = playerGridPath;
+                    selectedPath = PlayerGridPath;
 
                     if (itrator == selectedPath.Length - 1 && selectedPath[selectedPath.Length - 1] == gridLocation.ToVector2())
                     {
@@ -548,7 +577,7 @@ namespace RemGame
                     Move(Movement.Stop);
                     if (IsPlayerAlive)
                         meleAttack();
-
+                    /*
                     random = new Random();
                     double randomInterval = (random.NextDouble() * 10 + 1);
                     if (randomInterval < 4 && (DateTime.Now - evaded).TotalSeconds > 8)
@@ -557,25 +586,15 @@ namespace RemGame
                         evaded = DateTime.Now;
 
                     }
-
+                    */
                     break;
 
                 case Mode.Evade:
-
-                    dissapear = true;
-
-                    if (player.Position.X > Position.X - 200)
-                        Move(Movement.Right);
-
-                    if (player.Position.X < Position.X + 200)
+                    speed *= 1.5f;
+                    if (player.Position.X > Position.X)
                         Move(Movement.Left);
-
-                    if ((DateTime.Now - evaded).TotalSeconds > 4)
-                    {
-                        dissapear = false;
-                        mode = Mode.WalkToPlayer;
-
-                    }
+                    else if (player.Position.X < Position.X)
+                        Move(Movement.Right);
 
                     break;
 
@@ -607,13 +626,18 @@ namespace RemGame
 
                     if (selectedPath[itrator + 1].Y < gridLocation.Y)
                     {
-                        wheel.Body.ApplyLinearImpulse(new Vector2(0, -4));
+
+                        wheel.Body.ApplyLinearImpulse(new Vector2(0, -3));
 
                     }
-
-                    itrator++;
-
+         
+                        itrator++;
                 }
+
+         
+               
+                    previousPosition = Position;
+                
 
             }
             else if (mode != Mode.Evade)
@@ -623,67 +647,8 @@ namespace RemGame
 
             }
 
-
-            /*
-            if (patrolGridPath[itrator].Y == gridLocation.Y && map.isPassable((int)patrolGridPath[itrator].X + 1, (int)patrolGridPath[itrator].Y))
-            {
-
-                if (gridLocation.ToVector2() != patrolGridPath[itrator + 1])
-                {
-                    Move(Movement.Right);
-                    direction = Movement.Right;
-                    isMoving = true;
-                }
-                else
-                    reached = true;
-
-                if(reached)
-                {
-                    itrator++;
-                    //Move(Movement.Stop);
-                    //isMoving = false;
-
-                }
-
-                if (patrolGridPath[itrator + 1].Y < gridLocation.Y)
-                {
-                    isMoving = false;
-                    wheel.Body.ApplyLinearImpulse(new Vector2(0, -6));
-                }
-            }
-            */
-            /*
-            if (gridLocation.ToVector2() != gridpath[itrator])
-            {
-                Move(Movement.Right);
-                direction = Movement.Right;
-                isMoving = true;
-            }
-            else
-            */
-
-            // Console.WriteLine("grid vector :" + patrolGridPath[itrator] + "enemy vector :" + gridLocation);
-            //Console.WriteLine(itrator);
         }
-        /*
-        else if(gridpath[itrator].Y == y && gridLocation.X == gridpath[itrator].X)
-        {
-            Move(Movement.Left);
-            direction = Movement.Left;
-            isMoving = true;
-        }
-
-        else if (gridpath[itrator].Y < gridLocation.Y && gridpath[itrator].X == gridLocation.X + 1)
-        {
-            wheel.Body.ApplyLinearImpulse(new Vector2(0, -2));
-            itrator++;
-            Console.WriteLine(" WANTS TO JUMP grid vector :" + gridpath[itrator] + "enemy vector :" + gridLocation);
-
-        }
-        */
-
-
-
+  
         public Vector2[] findPathToPatrol(int dest)
         {
             int maxDestanationValue;
@@ -697,7 +662,7 @@ namespace RemGame
 
 
             Vector2[] arr;
-            path = PathFinder.FindPath(gridLocation.ToVector2(), new Vector2(gridLocation.X + maxDestanationValue, gridLocation.Y), "Euclidain");
+            path = PathFinder.FindPath(gridLocation.ToVector2(), new Vector2(gridLocation.X + maxDestanationValue, gridLocation.Y), "Manhattan");
             if (path == null)
                 arr = new Vector2[] { gridLocation.ToVector2() };
             else
@@ -722,6 +687,48 @@ namespace RemGame
         private void swtichLookingDirection()
         {
             wheel.Body.ApplyLinearImpulse(new Vector2(0, -0.2f));
+        }
+      	
+        private static Decision MainDecisionTree()
+        {           
+            //Decision 3
+            var evadeBranch = new DecisionQuery
+            {
+                Title = "Evade",
+                Test = (en) => en.Health > 0,
+                Positive = new DecisionResult { Result = true , Action = "Evade" },
+                Negative = new DecisionResult { Result = false }
+            };
+            
+
+            //Decision 2
+            var attackBranch = new DecisionQuery
+            {
+                Title = "Attack",
+                Test = (en) => en.PlayerGridPath.Length < 6,
+                Positive = new DecisionResult { Result = true, Action = "Attack" },
+                Negative = new DecisionResult { Result = false }
+            };
+
+            //Decision 1
+            var HealthBranch = new DecisionQuery
+            {
+                Title = "Have enough health",
+                Test = (en) => en.Health > en.Startinghealth/2,
+                Positive = attackBranch,
+                Negative = evadeBranch
+            };
+
+            //Decision 0
+            var trunk = new DecisionQuery
+            {
+                Title = "Want to attack",
+                Test = (en) => en.IsPlayerAlive,
+                Positive = HealthBranch,
+                Negative = new DecisionResult { Result = false }
+            };
+
+            return trunk;
         }
         /*
         private float GetRandomSpeed()
