@@ -1114,7 +1114,6 @@ namespace RemGame
                 Move(Movement.Stop);
                 isFreezing = true;
                 previousFreeze = DateTime.Now;
-                wheel.Body.ApplyForce(new Vector2(0 - 5));
             }
         }
 
