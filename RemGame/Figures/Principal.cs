@@ -23,6 +23,7 @@ namespace RemGame
         private bool colorPicked = false;
         private bool isAlive = true;
         Random random;
+        private Random freezeLuck;
 
         private int playerDistanceToAttack;
 
@@ -72,14 +73,8 @@ namespace RemGame
         private Mode mode;
         private Mode previuosMode;
 
-
         private int patrolRange;
-     
-
-        private Vector2[] patrolGridPath;
-        private Vector2[] playerGridPath;
-
-
+   
         private int patrolDirection = 1;
 
         private DateTime previousWander = DateTime.Now;   // time at which we previously jumped
@@ -465,11 +460,11 @@ namespace RemGame
             
 
 
-            pv1.Draw(gameTime, spriteBatch);
-            pv2.Draw(gameTime, spriteBatch);
-            pv3.Draw(gameTime, spriteBatch);
-            pv4.Draw(gameTime, spriteBatch);
-            pv5.Draw(gameTime, spriteBatch);
+            //pv1.Draw(gameTime, spriteBatch);
+            //pv2.Draw(gameTime, spriteBatch);
+            //pv3.Draw(gameTime, spriteBatch);
+            //pv4.Draw(gameTime, spriteBatch);
+            //pv5.Draw(gameTime, spriteBatch);
 
 
 
@@ -486,7 +481,7 @@ namespace RemGame
             //spriteBatch.DrawString(font, itrator.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
             //spriteBatch.DrawString(font, this.position.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
-            //spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
+            spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
         }
 
         public void UpdateAI()
@@ -509,8 +504,28 @@ namespace RemGame
                 if ((playerGridPath.Length < 10 && playerGridPath.Length > 1))//sight range
                 {
 
-                    if (playerGridPath.Length < 6) //attack range                
+                    var trunk = MainDecisionTree();
+                    decision = trunk.Evaluate(this);
+                    Console.WriteLine(decision);
+                    Console.WriteLine(Health);
+
+                    if (decision == "Attack") //attack range                
                         mode = Mode.Attack;
+
+                    else if (decision == "Evade") {
+                        //////maybe needs to be deleted and keep old evade////////////////
+                        random = new Random();
+                        double randomInterval = (random.NextDouble() * 10 + 1);
+                        if (randomInterval < 4 && (DateTime.Now - evaded).TotalSeconds > 8)
+                        {
+                            mode = Mode.Evade;
+                            evaded = DateTime.Now;
+
+                        }
+                        //////////////////////////////////////////////////////////
+                        //mode = Mode.Evade;
+
+                    }
 
                     else if (mode != Mode.WalkToPlayer)
                         mode = Mode.WalkToPlayer;
@@ -562,7 +577,7 @@ namespace RemGame
                         patrolGridPath = findPathToPatrol(patrolDirection * 20);
                         selectedPath = patrolGridPath;
                         endOfPatrol = false;
-                        
+
                     }
 
                     else if (itrator == selectedPath.Length - 1 && selectedPath[selectedPath.Length - 1] == gridLocation.ToVector2())
@@ -577,7 +592,7 @@ namespace RemGame
                     itrator = 0;
                     selectedPath = playerGridPath;
 
-                     if (itrator == selectedPath.Length - 1 && selectedPath[selectedPath.Length - 1] == gridLocation.ToVector2())
+                    if (itrator == selectedPath.Length - 1 && selectedPath[selectedPath.Length - 1] == gridLocation.ToVector2())
                     {
 
                         if (!wandered)
@@ -595,46 +610,47 @@ namespace RemGame
                         }
 
                     }
-                    
+
                     break;
 
                 case Mode.Attack:
                     if (player.Position.X > Position.X && !lookingRight)
                         Move(Movement.Right);
-                    else if(player.Position.X < Position.X && lookingRight)
+                    else if (player.Position.X < Position.X && lookingRight)
                         Move(Movement.Left);
                     Move(Movement.Stop);
-                    if(IsPlayerAlive)
-                        meleAttack();
-                    
+                    if (IsPlayerAlive)
+                        //meleAttack();
+                    FreezePlayer();
+
+                    /*
                     random = new Random();
                     double randomInterval = (random.NextDouble() * 10 + 1);
                     if (randomInterval < 4 && (DateTime.Now - evaded).TotalSeconds > 8)
                     {
                         mode = Mode.Evade;
-                        evaded = DateTime.Now;                     
+                        evaded = DateTime.Now;
 
                     }
-
+                    */
                     break;
 
                 case Mode.Evade:
 
                     dissapear = true;
 
-                    if (player.Position.X > Position.X-200)
+                    if (player.Position.X > Position.X - 200)
                         Move(Movement.Right);
 
-                    if (player.Position.X < Position.X +200)
+                    if (player.Position.X < Position.X + 200)
                         Move(Movement.Left);
 
                     if ((DateTime.Now - evaded).TotalSeconds > 4)
                     {
                         dissapear = false;
                         mode = Mode.WalkToPlayer;
-
                     }
-                    
+
                     break;
 
                 default:
@@ -673,73 +689,14 @@ namespace RemGame
                 }
 
             }
-            else if(mode != Mode.Evade)
+            else if (mode != Mode.Evade)
             {
                 Move(Movement.Stop);
                 isMoving = false;
 
             }
 
-
-            /*
-            if (patrolGridPath[itrator].Y == gridLocation.Y && map.isPassable((int)patrolGridPath[itrator].X + 1, (int)patrolGridPath[itrator].Y))
-            {
-
-                if (gridLocation.ToVector2() != patrolGridPath[itrator + 1])
-                {
-                    Move(Movement.Right);
-                    direction = Movement.Right;
-                    isMoving = true;
-                }
-                else
-                    reached = true;
-
-                if(reached)
-                {
-                    itrator++;
-                    //Move(Movement.Stop);
-                    //isMoving = false;
-
-                }
-
-                if (patrolGridPath[itrator + 1].Y < gridLocation.Y)
-                {
-                    isMoving = false;
-                    wheel.Body.ApplyLinearImpulse(new Vector2(0, -6));
-                }
-            }
-            */
-            /*
-            if (gridLocation.ToVector2() != gridpath[itrator])
-            {
-                Move(Movement.Right);
-                direction = Movement.Right;
-                isMoving = true;
-            }
-            else
-            */
-
-            // Console.WriteLine("grid vector :" + patrolGridPath[itrator] + "enemy vector :" + gridLocation);
-            //Console.WriteLine(itrator);
         }
-        /*
-        else if(gridpath[itrator].Y == y && gridLocation.X == gridpath[itrator].X)
-        {
-            Move(Movement.Left);
-            direction = Movement.Left;
-            isMoving = true;
-        }
-
-        else if (gridpath[itrator].Y < gridLocation.Y && gridpath[itrator].X == gridLocation.X + 1)
-        {
-            wheel.Body.ApplyLinearImpulse(new Vector2(0, -2));
-            itrator++;
-            Console.WriteLine(" WANTS TO JUMP grid vector :" + gridpath[itrator] + "enemy vector :" + gridLocation);
-
-        }
-        */
-
-
 
         public Vector2[] findPathToPatrol(int dest)
         {
@@ -780,6 +737,48 @@ namespace RemGame
         {
             wheel.Body.ApplyLinearImpulse(new Vector2(0, -0.2f));
         }
+
+        private static Decision MainDecisionTree()
+        {
+            //Decision 3
+            var evadeBranch = new DecisionQuery
+            {
+                Title = "Evade",
+                Test = (en) => en.Health > 0,
+                Positive = new DecisionResult { Result = true, Action = "Evade" },
+                Negative = new DecisionResult { Result = false }
+            };
+
+
+            //Decision 2
+            var attackBranch = new DecisionQuery
+            {
+                Title = "Attack",
+                Test = (en) => en.PlayerGridPath.Length < 6,
+                Positive = new DecisionResult { Result = true, Action = "Attack" },
+                Negative = new DecisionResult { Result = false }
+            };
+
+            //Decision 1
+            var HealthBranch = new DecisionQuery
+            {
+                Title = "Have enough health",
+                Test = (en) => en.Health > en.Startinghealth / 2,
+                Positive = attackBranch,
+                Negative = evadeBranch
+            };
+
+            //Decision 0
+            var trunk = new DecisionQuery
+            {
+                Title = "Want to attack",
+                Test = (en) => en.IsPlayerAlive,
+                Positive = HealthBranch,
+                Negative = new DecisionResult { Result = false }
+            };
+
+            return trunk;
+        }
         /*
         private float GetRandomSpeed()
         {
@@ -789,5 +788,16 @@ namespace RemGame
             return x;
         }
         */
+
+        private void FreezePlayer()
+        {
+            freezeLuck = new Random();
+            float chance = freezeLuck.Next(1000);
+            Console.WriteLine("luck:" + chance);
+            if (chance == 1)
+            {
+                player.freeze();
+            }
+        }
     }
 }

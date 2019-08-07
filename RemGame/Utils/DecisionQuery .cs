@@ -18,7 +18,7 @@ namespace RemGame
             bool result = this.Test(en);
             string resultAsString = result ? "yes" : "no";
 
-            Console.WriteLine($"\t- {this.Title}? {resultAsString} ");
+            //Console.WriteLine($"\t- {this.Title}? {resultAsString} ");
 
             if (result) return this.Positive.Evaluate(en);
             else return this.Negative.Evaluate(en);

@@ -1,3 +1,3 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/Fonts/Font.spritefont","C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/bin/Windows/Content/Fonts/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2065,21521,0.2922187
-"C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/level_01_A.jpg","C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/bin/Windows/Content/level_01_A.xnb","TextureProcessor","Texture2DContent",2607558,30474325,0.9435098
+"C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/Fonts/Font.spritefont","C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/bin/Windows/Content/Fonts/Font.xnb","FontDescriptionProcessor","SpriteFontContent",2065,21521,0.2762598
+"C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/level_01_A.jpg","C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/bin/Windows/Content/level_01_A.xnb","TextureProcessor","Texture2DContent",2607558,30474325,0.8716695

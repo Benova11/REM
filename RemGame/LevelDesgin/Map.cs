@@ -157,7 +157,18 @@ namespace RemGame
 
 
                     }
-                    else if (number == 8)//Principal
+
+                    else if (number == 8)
+                    {
+                        Obstacle obs2 = new Obstacle(world, texture, new Vector2(64, 64), font, false);
+                        obs2.Position = new Vector2(x * size + (obs2.Size.X / 2), y * size);
+                        ObstacleTiles.Add(obs2);
+                        obs2.KinesisOn = true;
+                        if (!passableDict.ContainsKey(9))
+                            passableDict.Add(9, obs2.Passable);
+
+                    }
+                    else if (number == 9)//Principal
                     {
                         Point startLocationGrid = new Point(x, y+2);
                         r = new Random();
@@ -170,16 +181,7 @@ namespace RemGame
                         en.GridLocation = startLocationGrid;                       
                         Enemies.Add(en);
                     }
-                    else if (number == 9)
-                    {
-                        Obstacle obs2 = new Obstacle(world, texture, new Vector2(64, 64), font,false);
-                        obs2.Position = new Vector2(x * size + (obs2.Size.X / 2), y * size);
-                        ObstacleTiles.Add(obs2);
-                        obs2.KinesisOn = true;
-                        if (!passableDict.ContainsKey(9))
-                            passableDict.Add(9, obs2.Passable);
-
-                    }
+                    
 
                     else if (number == 10)//groundedEnemey
                     {

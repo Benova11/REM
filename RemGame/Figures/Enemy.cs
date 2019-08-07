@@ -51,6 +51,7 @@ namespace RemGame
         protected bool isMoving;
         protected bool isAttacking;
 
+
         protected Vector2[] patrolGridPath;
         protected Vector2[] playerGridPath;
 
@@ -61,6 +62,8 @@ namespace RemGame
         Texture2D shootTexture;
 
         protected Texture2D gridColor;
+
+
 
 
         public Enemy(World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Point startLocationGrid, SpriteFont f)

@@ -132,6 +132,9 @@ namespace RemGame
         private DateTime previousBend = DateTime.Now;
         private const float bendInterval = 0.1f;        // in seconds
 
+        private DateTime previousFreeze = DateTime.Now;   // time at which we previously jumped
+        private const float freezeInterval = 2.0f;
+
         /// <summary>
         /// /////////////////////////////Art Assignment
         /// </summary>
@@ -172,7 +175,7 @@ namespace RemGame
 
         MouseState currentMouseState;
         MouseState previousMouseState = Mouse.GetState();
-
+        private bool isFreezing;
 
         public AnimatedSprite Anim { get => anim; set => anim = value; }
 
@@ -206,6 +209,7 @@ namespace RemGame
             this.f = f;
 
             IsMoving = false;
+            isFreezing = false;
             Vector2 torsoSize = new Vector2(size.X, size.Y - size.X / 2.0f);
             float wheelSize = size.X;
 
@@ -637,8 +641,13 @@ namespace RemGame
 
         public override void Update(GameTime gameTime)
         {
-       
+            
             walkingInstance.Volume = 0.1f;
+            if ((DateTime.Now - previousFreeze).TotalSeconds > freezeInterval)
+            {
+                isFreezing = false;
+            }
+
             if (isAlive)
             {
 
@@ -755,131 +764,133 @@ namespace RemGame
                 /////Movments
                 ///
                 ///Move Right
-                if (!isMeleAttacking)
+                if (!isFreezing)
                 {
-                    if (keyboardState.IsKeyDown(Keys.A))
+                    if (!isMeleAttacking)
                     {
-                        if (direction == Movement.Right && !isJumping)
-                            ResetPlayerDynamics();
+                        if (keyboardState.IsKeyDown(Keys.A))
+                        {
+                            if (direction == Movement.Right && !isJumping)
+                                ResetPlayerDynamics();
 
-                        Move(Movement.Left);
-                        direction = Movement.Left;
-                        IsMoving = true;
+                            Move(Movement.Left);
+                            direction = Movement.Left;
+                            IsMoving = true;
 
+                        }
+
+                        ///Move Left
+                        else if (keyboardState.IsKeyDown(Keys.D))
+                        {
+                            if (direction == Movement.Left && !isJumping)
+                                ResetPlayerDynamics();
+
+                            Move(Movement.Right);
+                            direction = Movement.Right;
+                            IsMoving = true;
+                            if (!firstMove)
+                                firstMove = true;
+
+                        }
+                        ///No Moving
+                        else
+                        {
+                            IsMoving = false;
+                            Move(Movement.Stop);
+                        }
                     }
-
-                    ///Move Left
-                    else if (keyboardState.IsKeyDown(Keys.D))
-                    {
-                        if (direction == Movement.Left && !isJumping)
-                            ResetPlayerDynamics();
-
-                        Move(Movement.Right);
-                        direction = Movement.Right;
-                        IsMoving = true;
-                        if (!firstMove)
-                            firstMove = true;
-
-                    }
-                    ///No Moving
-                    else
-                    {
-                        IsMoving = false;
+                    if (isFalling)
                         Move(Movement.Stop);
-                    }
-                }
-                if (isFalling)
-                    Move(Movement.Stop);
 
-                ///Jump
-                if (keyboardState.IsKeyDown(Keys.Space) && (!prevKeyboardState.IsKeyDown(Keys.Space)))
-                {
-                    if (!IsSliding)
-                        Jump();
-                }
-                ///Move While jump
-                ///
-
-                if (isJumping)
-                {
-
-                    if (keyboardState.IsKeyDown(Keys.D))
+                    ///Jump
+                    if (keyboardState.IsKeyDown(Keys.Space) && (!prevKeyboardState.IsKeyDown(Keys.Space)))
                     {
-                        if (wheel.Body.LinearVelocity.X < 4.0f)
-                            wheel.Body.ApplyLinearImpulse(new Vector2(0.07f, 0));
-                        if (wheel.Body.LinearVelocity.X < 1.0f)
+                        if (!IsSliding)
+                            Jump();
+                    }
+                    ///Move While jump
+                    ///
+
+                    if (isJumping)
+                    {
+
+                        if (keyboardState.IsKeyDown(Keys.D))
                         {
-                            axis1.MotorEnabled = false;
-                            wheel.Body.ApplyForce(new Vector2(0, 1.0f));
+                            if (wheel.Body.LinearVelocity.X < 4.0f)
+                                wheel.Body.ApplyLinearImpulse(new Vector2(0.07f, 0));
+                            if (wheel.Body.LinearVelocity.X < 1.0f)
+                            {
+                                axis1.MotorEnabled = false;
+                                wheel.Body.ApplyForce(new Vector2(0, 1.0f));
+                            }
+                        }
+
+                        if (keyboardState.IsKeyDown(Keys.A))
+                        {
+                            if (wheel.Body.LinearVelocity.X > -4.0f)
+                                wheel.Body.ApplyLinearImpulse(new Vector2(-0.07f, 0));
+                            if (wheel.Body.LinearVelocity.X > -1.0f)
+                            {
+                                axis1.MotorEnabled = false;
+                                wheel.Body.ApplyForce(new Vector2(0, 1.0f));
+                            }
                         }
                     }
 
-                    if (keyboardState.IsKeyDown(Keys.A))
+
+
+
+                    ///Slide
+                    if (keyboardState.IsKeyDown(Keys.LeftShift) && (!prevKeyboardState.IsKeyDown(Keys.LeftShift)))
                     {
-                        if (wheel.Body.LinearVelocity.X > -4.0f)
-                            wheel.Body.ApplyLinearImpulse(new Vector2(-0.07f, 0));
-                        if (wheel.Body.LinearVelocity.X > -1.0f)
-                        {
-                            axis1.MotorEnabled = false;
-                            wheel.Body.ApplyForce(new Vector2(0, 1.0f));
-                        }
+
+                        if (keyboardState.IsKeyDown(Keys.D))
+                            Slide(Movement.Right);
+
+                        else if (keyboardState.IsKeyDown(Keys.A))
+                            Slide(Movement.Left);
+
+                    }
+                    ///Bend
+                    if (keyboardState.IsKeyDown(Keys.S))
+                    {
+                        bend();
+                        IsBending = true;
+
+                    }
+                    ///Check for leaving bend pose
+                    if (keyboardState.IsKeyUp(Keys.S) && prevKeyboardState.IsKeyDown(Keys.S))
+                    {
+                        IsBending = false;
+                        upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+                    }
+
+                    /////////Actions///////////////////////
+                    ///Ranged Shot
+                    ///Calculate Direction For Shooting
+                    if (currentMouseState.RightButton == ButtonState.Pressed && !(previousMouseState.RightButton == ButtonState.Pressed))
+                    {
+                        shootDirection = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
+
+                    }
+                    ///Calculate Motion Vector For Shooting
+                    if (currentMouseState.RightButton == ButtonState.Released && (previousMouseState.RightButton == ButtonState.Pressed) && !isSliding)
+                    {
+                        shootBase = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
+                        Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X), (shootDirection.Y - shootBase.Y));
+                        if (shootForce.X > 5 || shootForce.X < -5 || shootForce.Y > 5 || shootForce.Y < -5)
+                            rangedShoot(shootForce * 3);
+
+                    }
+
+                    ///Sraight Shot / might change to Mele
+                    if (currentMouseState.LeftButton == ButtonState.Pressed && !(previousMouseState.LeftButton == ButtonState.Pressed) && !(currentMouseState.RightButton == ButtonState.Pressed) && !isSliding)
+
+                    {
+                        Shoot();
+
                     }
                 }
-
-
-
-
-                ///Slide
-                if (keyboardState.IsKeyDown(Keys.LeftShift) && (!prevKeyboardState.IsKeyDown(Keys.LeftShift)))
-                {
-
-                    if (keyboardState.IsKeyDown(Keys.D))
-                        Slide(Movement.Right);
-
-                    else if (keyboardState.IsKeyDown(Keys.A))
-                        Slide(Movement.Left);
-
-                }
-                ///Bend
-                if (keyboardState.IsKeyDown(Keys.S))
-                {
-                    bend();
-                    IsBending = true;
-                    
-                }
-                ///Check for leaving bend pose
-                if (keyboardState.IsKeyUp(Keys.S) && prevKeyboardState.IsKeyDown(Keys.S))
-                {
-                    IsBending = false;
-                    upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
-                }
-
-                /////////Actions///////////////////////
-                ///Ranged Shot
-                ///Calculate Direction For Shooting
-                if (currentMouseState.RightButton == ButtonState.Pressed && !(previousMouseState.RightButton == ButtonState.Pressed))
-                {
-                    shootDirection = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
-
-                }
-                ///Calculate Motion Vector For Shooting
-                if (currentMouseState.RightButton == ButtonState.Released && (previousMouseState.RightButton == ButtonState.Pressed) && !isSliding)
-                {
-                    shootBase = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
-                    Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X), (shootDirection.Y - shootBase.Y));
-                    if (shootForce.X > 5 || shootForce.X < -5 || shootForce.Y > 5 || shootForce.Y < -5)
-                        rangedShoot(shootForce * 3);
-
-                }
-
-                ///Sraight Shot / might change to Mele
-                if (currentMouseState.LeftButton == ButtonState.Pressed && !(previousMouseState.LeftButton == ButtonState.Pressed) && !(currentMouseState.RightButton == ButtonState.Pressed) && !isSliding)
-
-                {
-                    Shoot();
-
-                }
-
                 ///////////////////////////////////////////////////////////////Sound Effects///////////////////////////////////////////////////////////////////
                 if (direction != Movement.Stop && isMoving)
                 {
@@ -1094,6 +1105,17 @@ namespace RemGame
             else
                 isFalling = false;
 
+        }
+
+        public void freeze()
+        {
+            if (!isFreezing)
+            {
+                Move(Movement.Stop);
+                isFreezing = true;
+                previousFreeze = DateTime.Now;
+                wheel.Body.ApplyForce(new Vector2(0 - 5));
+            }
         }
 
 
