@@ -20,6 +20,7 @@ namespace RemGame
         private List<Tile> collisionTiles = new List<Tile>();
         private List<Obstacle> obstacleTiles = new List<Obstacle>();
         private List<Enemy> enemies = new List<Enemy>();
+        private List<HealthBooster> HealthBoostersList = new List<HealthBooster>();
 
         private Kid player;
         private int enemies_counter = 2;
@@ -198,6 +199,13 @@ namespace RemGame
 
                     }
 
+                    else if (number == 11)//HealthBooster
+                    {
+                        HealthBooster hb = new HealthBooster(world, content, player, 3, new Vector2(x * 64, y * 64),new Vector2(50,50));
+                        hb.Position = new Vector2(x * size , y * size);
+                        HealthBoostersList.Add(hb);
+                    }
+
                     width = (x + 1) * size;
                     height = (y + 1) * size;
 
@@ -234,6 +242,12 @@ namespace RemGame
 
             }
 
+            foreach (HealthBooster hb in HealthBoostersList)
+            {
+                hb.Update(gameTime);
+            }
+
+            
         }
         //for debbbuging
         public void DrawGrid(GameTime gameTime, int[,] gameMap, SpriteBatch spriteBatch, SpriteFont f)
@@ -262,7 +276,16 @@ namespace RemGame
                 en.Draw(gameTime, spriteBatch,font);
         }
 
-        public int getGridObject(int x,int y)
+        public void DrawHealthBoosters(GameTime gameTime, SpriteBatch spriteBatch)
+        {
+
+            foreach (HealthBooster hb in HealthBoostersList)
+            {
+                hb.Draw(gameTime,spriteBatch);
+            }
+        }
+
+    public int getGridObject(int x,int y)
         {
             if (x > 0 && y > 0)
                 return Grid[y, x];

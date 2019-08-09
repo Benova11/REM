@@ -22,6 +22,12 @@ namespace RemGame
         {
             this.rectangle.Width -= damage;
         }
+
+        public void increase(int value)
+        {
+            this.rectangle.Width += value;
+        }
+
         public void Draw(SpriteBatch spriteBatch,Camera2D cam)
         {
  

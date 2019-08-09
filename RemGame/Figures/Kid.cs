@@ -63,6 +63,8 @@ namespace RemGame
         private PhysicsObject midBody;
         private PhysicsObject wheel;
 
+        private Rectangle collisionRec;
+
         private RevoluteJoint axis1;
         private Joint axis2;
 
@@ -199,6 +201,7 @@ namespace RemGame
         public HealthBar HealthBar { get => health_bar; set => health_bar = value; }
         public Point GridLocation { get => gridLocation; set => gridLocation = value; }
         public playerMode Mode { get => mode; set => mode = value; }
+        public Rectangle CollisionRec { get => collisionRec; set => collisionRec = value; }
 
         public Kid(Camera2D cam, World world, Vector2 size, float mass, Vector2 startPosition, bool isBent, SpriteFont f)
         {
@@ -242,11 +245,12 @@ namespace RemGame
 
 
             upBody.Body.CollisionCategories = Category.Cat10;
+            midBody.Body.CollisionCategories = Category.Cat10;
             wheel.Body.CollisionCategories = Category.Cat11;
 
-            upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
-            midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
-            wheel.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+            upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30| Category.Cat5;
+            midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30 | Category.Cat5;
+            wheel.Body.CollidesWith = Category.Cat1 | Category.Cat30 | Category.Cat5;
 
             upBody.Body.OnCollision += new OnCollisionEventHandler(HitByEnemy);
             midBody.Body.OnCollision += new OnCollisionEventHandler(HitByEnemy);
@@ -660,6 +664,8 @@ namespace RemGame
                 //set the coordinates for camera to follow              
                 Vector2 moveTo = Position - cameraToFollow;
                 Vector2 fixedPosition;
+
+                collisionRec = new Rectangle((int)Position.X, (int)Position.Y, (int)size.X, (int)size.X * 3);
 
                 if (!IsBending)
                     fixedPosition = new Vector2(moveTo.X + 150, moveTo.Y);

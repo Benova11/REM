@@ -42,6 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Figures\groundedEnemy.cs" />
+    <Compile Include="Figures\HealthBooster.cs" />
     <Compile Include="Figures\Principal.cs" />
     <Compile Include="Figures\Shot.cs" />
     <Compile Include="LevelDesgin\Bag.cs" />
