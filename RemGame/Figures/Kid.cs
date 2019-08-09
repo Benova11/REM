@@ -83,6 +83,8 @@ namespace RemGame
 
         Texture2D yoyoTexture;
         Texture2D scissorsTexture;
+        Texture2D frozenState;
+
 
         private int health = 30;
         private bool isAlive = true;
@@ -267,6 +269,7 @@ namespace RemGame
             ////Art Init
             yoyoTexture = Content.Load<Texture2D>("Player/Anim/Yoyo");
             scissorsTexture = Content.Load<Texture2D>("Player/Anim/Scissors_Open");
+            frozenState = Content.Load<Texture2D>("Player/Anim/Iceberg");
 
 
             playerCrouch = Content.Load<Texture2D>("Player/Anim/Ron_Crouch");
@@ -1016,7 +1019,7 @@ namespace RemGame
         {
             if (!GameOver)
             {
-                //upBody.Draw(gameTime, spriteBatch);
+                //upBody.Draw(gameTime, spriteBatch);              
                 Rectangle dest = upBody.physicsCircleObjRecToDraw();
                 dest.Height = dest.Height + (int)wheel.Size.Y / 2;
                 dest.Y = dest.Y + (int)wheel.Size.Y / 2;
@@ -1027,6 +1030,15 @@ namespace RemGame
                     else
                         Anim.Draw(spriteBatch, dest, upBody.Body, true);
 
+                }
+
+                if (isFreezing)
+                {
+                    dest.X -= 70;
+                    dest.Y -= 70;
+                    dest.Height *= 3;
+                    dest.Width *= 3;
+                    spriteBatch.Draw(frozenState, dest, Color.White * 0.7f);
                 }
 
                 if (shot != null && !shot.Body.IsDisposed)

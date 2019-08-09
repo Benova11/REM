@@ -267,6 +267,18 @@
 /processorParam:TextureFormat=Color
 /build:misc/HealthBar.jpg
 
+#begin Player/Anim/Iceberg.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Player/Anim/Iceberg.jpg
+
 #begin Player/Anim/Jump/Ron_Jump_01_start.png
 /importer:TextureImporter
 /processor:TextureProcessor

@@ -754,7 +754,7 @@ namespace RemGame
             var attackBranch = new DecisionQuery
             {
                 Title = "Attack",
-                Test = (en) => en.PlayerGridPath.Length < 6,
+                Test = (en) => en.PlayerGridPath.Length < 7,
                 Positive = new DecisionResult { Result = true, Action = "Attack" },
                 Negative = new DecisionResult { Result = false }
             };

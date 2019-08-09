@@ -198,8 +198,6 @@ namespace RemGame
 
                     }
 
-
-
                     width = (x + 1) * size;
                     height = (y + 1) * size;
 

@@ -141,10 +141,10 @@ namespace RemGame
 
             // Connect the feet to the torso
             axis2 = JointFactory.CreateRevoluteJoint(world, midBody.Body, wheel.Body, Vector2.Zero);
-            axis2.CollideConnected = false;
+            //axis2.CollideConnected = false;
             axis2.MotorEnabled = true;
             axis2.MotorSpeed = 0;
-            axis2.MaxMotorTorque = 2;
+            axis2.MaxMotorTorque = 20;
 
             torso.Body.CollisionCategories = Category.Cat20;
             midBody.Body.CollisionCategories = Category.Cat20;
@@ -214,8 +214,15 @@ namespace RemGame
             if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
             {
                 isJumping = true;
-                //torso.Body.ApplyLinearImpulse(jumpForce);
-                wheel.Body.ApplyLinearImpulse(jumpForce * new Vector2(0, -10));
+                if (direction == Movement.Right)
+                {
+                    wheel.Body.ApplyLinearImpulse(jumpForce * new Vector2(0, -15));
+                }
+                else
+                {
+                    wheel.Body.ApplyLinearImpulse(jumpForce * new Vector2(0, -15));
+                }
+
                 previousJump = DateTime.Now;
             }
         }
@@ -297,6 +304,15 @@ namespace RemGame
         {
             if (isAlive)
             {
+                if (isJumping)
+                {
+                    //if(map.isPassable(gridLocation.X,gridLocation.Y))
+                    if (direction == Movement.Right)
+                        torso.Body.ApplyForce(new Vector2(34, 0));
+                    if (direction == Movement.Left)
+                        torso.Body.ApplyForce(new Vector2(-34, 0));
+                }
+
                 if (map.isPassable(GridLocation.X, GridLocation.Y + 1))
                     isInAir = true;
                 else
@@ -305,8 +321,6 @@ namespace RemGame
                     if (isJumping)
                         isJumping = false;
                 }
-
-
 
                 if (gridLocation == startLocationGrid)
                     PathFinder.SetMap(map);
@@ -424,12 +438,26 @@ namespace RemGame
 
         public void UpdateAI()
         {
+            /*
+            if (isJumping)
+            {
+                if (map.isPassable(gridLocation.X, gridLocation.Y + 1))
+                {
+                    if(direction == Movement.Right)
+                    {
+                        wheel.Body.ApplyForce(new Vector2(3,0));
+                    }
+                    else
+                        wheel.Body.ApplyForce(new Vector2(-3, 0));
 
+                }
+            }
+            */
             if (selectedPath == null)
                 selectedPath = new Vector2[] { Vector2.Zero };
 
             //Borders for chcking path to the player,to reduce calculations
-            if ((player.GridLocation.X < GridLocation.X + 50 && player.GridLocation.X > GridLocation.X - 50) && (player.GridLocation.Y > 0) && player.GridLocation != null && !isInAir)
+            if ((player.GridLocation.X < GridLocation.X + 20 && player.GridLocation.X > GridLocation.X - 20) && (player.GridLocation.Y > 0) && player.GridLocation != null && !isInAir)
             {
                playerGridPath = findPathToPlayer();
 
@@ -438,13 +466,11 @@ namespace RemGame
             if (PlayerGridPath == null)
                 PlayerGridPath = new Vector2[] { gridLocation.ToVector2() };
          
-                if ((PlayerGridPath.Length < 10 && PlayerGridPath.Length > 1))//sight range
+                if ((PlayerGridPath.Length < 14 && PlayerGridPath.Length > 1))//sight range
                 {
 
                 var trunk = MainDecisionTree();
                 decision = trunk.Evaluate(this);
-                Console.WriteLine(decision);
-                Console.WriteLine(Health);
                 
                 if (decision == "Attack") //attack range                
                     mode = Mode.Attack;
@@ -602,6 +628,12 @@ namespace RemGame
 
                 if (gridLocation.ToVector2() == selectedPath[itrator])
                 {
+                    if (selectedPath[itrator + 1].Y < gridLocation.Y)
+                    {
+                        Move(Movement.Stop);
+                        Jump();
+
+                    }
 
                     if (selectedPath[itrator + 1].X > gridLocation.X)
                     {
@@ -614,18 +646,7 @@ namespace RemGame
                     {
                         direction = Movement.Left;
                         Move(Movement.Left);
-                    }
-
-                    if (selectedPath[itrator + 1].Y < gridLocation.Y)
-                    {
-                        /*
-                        if(direction == Movement.Right)
-                            wheel.Body.ApplyLinearImpulse(new Vector2(0.5f, -3));
-                        else
-                            wheel.Body.ApplyLinearImpulse(new Vector2(-0.5f, -3));
-                        */
-                        Jump();
-                    }
+                    }  
          
                         itrator++;
                 }
