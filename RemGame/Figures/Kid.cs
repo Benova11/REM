@@ -248,9 +248,9 @@ namespace RemGame
             midBody.Body.CollisionCategories = Category.Cat10;
             wheel.Body.CollisionCategories = Category.Cat11;
 
-            upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30| Category.Cat5;
-            midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30 | Category.Cat5;
-            wheel.Body.CollidesWith = Category.Cat1 | Category.Cat30 | Category.Cat5;
+            upBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+            midBody.Body.CollidesWith = Category.Cat1 | Category.Cat30;
+            wheel.Body.CollidesWith = Category.Cat1 | Category.Cat30;
 
             upBody.Body.OnCollision += new OnCollisionEventHandler(HitByEnemy);
             midBody.Body.OnCollision += new OnCollisionEventHandler(HitByEnemy);

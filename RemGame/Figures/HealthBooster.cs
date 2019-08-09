@@ -32,8 +32,6 @@ namespace RemGame
             body = BodyFactory.CreateRectangle(world, size.X * CoordinateHelper.pixelToUnit, size.Y * CoordinateHelper.pixelToUnit, 1);
             body.BodyType = BodyType.Static;
             body.CollisionCategories = Category.Cat5;
-            body.CollidesWith = Category.Cat10 | Category.Cat11;
-            //body.OnCollision += new OnCollisionEventHandler(Ron_OnCollision);
             collisionRec = new Rectangle((int)position.X, (int)position.Y,(int)size.X,(int)size.X);
 
         }
@@ -45,34 +43,22 @@ namespace RemGame
         public void TakeOff()
         {
             body.BodyType = BodyType.Dynamic;
-            body.ApplyForce(new Vector2(0,-4));
-            body.Rotation = 0.2f;
+            body.ApplyForce(new Vector2(3,-12));
+            body.Rotation += 0.2f;
             activated = true;
         }
 
-        bool Ron_OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
-        {
-            Console.Write("ONCOLISIONNNNN");
-            if (!activated && (fixtureB.CollisionCategories == Category.Cat10 || fixtureB.CollisionCategories == Category.Cat11))
-            {
-                TakeOff();
-                player.Health += value;
-                return true;
-            }
-               
-            else
-                return true;
-        }
 
         public void Update(GameTime gameTime)
         {
             if (collisionRec.Intersects(player.CollisionRec))
             {
-                Console.Write("ONCOLISIONNNNN");
-
                 TakeOff();
-                player.Health += value;
-                player.HealthBar.increase(value);
+                if (!activated)
+                {
+                    player.Health += value;
+                    player.HealthBar.increase(value);
+                }
             }
 
             if (this.Position.Y < -300)
@@ -90,11 +76,13 @@ namespace RemGame
            (
                (int)Position.X,
                (int)Position.Y,
-               50,
-               50
+               55,
+               55
            );
-            spriteBatch.Draw(texture, destination, null, Color.White, body.Rotation, new Vector2(texture.Width , texture.Height ), SpriteEffects.None, 0);
-
+            if (body.Enabled)
+            {
+                spriteBatch.Draw(texture, destination, null, Color.White, body.Rotation, new Vector2(texture.Width, texture.Height), SpriteEffects.None, 0);
+            }
         }
 
     }
