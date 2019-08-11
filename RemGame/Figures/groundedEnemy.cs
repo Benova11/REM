@@ -150,7 +150,7 @@ namespace RemGame
             midBody.Body.CollisionCategories = Category.Cat20;
             wheel.Body.CollisionCategories = Category.Cat21;
          
-            torso.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
+            torso.Body.CollidesWith = Category.Cat28 | Category.Cat7;
             wheel.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
             midBody.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
 
@@ -242,7 +242,7 @@ namespace RemGame
                 mele.Body.CollisionCategories = Category.Cat30;
                 mele.Body.CollidesWith = Category.Cat10 | Category.Cat11 | Category.Cat1;
 
-                mele.Body.Mass = 1.0f;
+                mele.Body.Mass = 0.4f;
                 mele.Body.IgnoreGravity = true;
                 mele.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y);
                 int dir;
@@ -343,7 +343,7 @@ namespace RemGame
                 else
                     anim = animations[0];
 
-                if (isMoving || direction == Movement.Stop) // apply animation
+                if (isMoving) // apply animation
                     Anim.Update(gameTime);
                  else //player will appear as standing with frame [1] from the atlas.
                    Anim.CurrentFrame = 1;
@@ -412,7 +412,7 @@ namespace RemGame
             }
 
             //torso.Draw(gameTime,spriteBatch);
-            Rectangle dest = torso.physicsRectnagleObjRecToDraw();
+            Rectangle dest = torso.physicsGroundedEnemyRectnagleObjRecToDraw();
             //dest.Height = dest.Height+(int)wheel.Size.Y/2;
             //dest.Y = dest.Y + (int)wheel.Size.Y/2;
             if (!torso.Body.IsDisposed && anim != null && !dissapear)
@@ -457,7 +457,7 @@ namespace RemGame
                 selectedPath = new Vector2[] { Vector2.Zero };
 
             //Borders for chcking path to the player,to reduce calculations
-            if ((player.GridLocation.X < GridLocation.X + 20 && player.GridLocation.X > GridLocation.X - 20) && (player.GridLocation.Y > 0) && player.GridLocation != null && !isInAir)
+            if ((Player.GridLocation.X < GridLocation.X + 20 && Player.GridLocation.X > GridLocation.X - 20) && (Player.GridLocation.Y > 0) && Player.GridLocation != null && !isInAir)
             {
                playerGridPath = findPathToPlayer();
 
@@ -585,10 +585,10 @@ namespace RemGame
                     break;
 
                 case Mode.Attack:
-                    if (player.Position.X > Position.X && !lookingRight)
+                    if (Player.Position.X > Position.X && !lookingRight)
                         Move(Movement.Right);
 
-                    else if (player.Position.X < Position.X && lookingRight)
+                    else if (Player.Position.X < Position.X && lookingRight)
                         Move(Movement.Left);
 
                     Move(Movement.Stop);
@@ -609,9 +609,9 @@ namespace RemGame
 
                 case Mode.Evade:
                     speed *= 1.5f;
-                    if (player.Position.X > Position.X)
+                    if (Player.Position.X > Position.X)
                         Move(Movement.Left);
-                    else if (player.Position.X < Position.X)
+                    else if (Player.Position.X < Position.X)
                         Move(Movement.Right);
 
                     break;
@@ -637,6 +637,7 @@ namespace RemGame
 
                     if (selectedPath[itrator + 1].X > gridLocation.X)
                     {
+
                         direction = Movement.Right;
                         Move(Movement.Right);
                     }
@@ -687,7 +688,7 @@ namespace RemGame
         {
             Vector2[] arr;
 
-            path = PathFinder.FindPath(gridLocation.ToVector2(), player.GridLocation.ToVector2(), "Manhattan");
+            path = PathFinder.FindPath(gridLocation.ToVector2(), Player.GridLocation.ToVector2(), "Manhattan");
             if (path == null)
                 arr = new Vector2[] { gridLocation.ToVector2() };
             else

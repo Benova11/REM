@@ -1,14 +1,9 @@
 ﻿using FarseerPhysics.Dynamics;
-using FarseerPhysics.Dynamics.Contacts;
 using FarseerPhysics.Factories;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace RemGame
 {
@@ -36,7 +31,7 @@ namespace RemGame
             body.BodyType = BodyType.Dynamic;
             body.IgnoreGravity = true;
             body.CollisionCategories = Category.Cat5;
-            collisionRec = new Rectangle((int)position.X, (int)position.Y,(int)size.X,(int)size.X);
+            collisionRec = new Rectangle((int)position.X, (int)position.Y,(int)size.X*2,(int)size.X*2);
             startingLocation = position;
             floatingDirection = -1;
         }
@@ -59,19 +54,20 @@ namespace RemGame
 
             if (activated)
             {
-                body.ApplyForce(new Vector2(-2, -5));
-                body.Rotation += 0.05f;
+                body.ApplyForce(new Vector2(-0.1f, -0.2f));
+                body.ApplyTorque(0.001f);
             }
 
             else
             {
                 body.ApplyForce(new Vector2(0, floatingDirection));
 
-                if (Position.Y <= startingLocation.Y - 25)
-                    floatingDirection = 1;
+                if (Position.Y <= startingLocation.Y - 15)
+                    floatingDirection = 0.3f;
 
-                else if (Position.Y + 25 >= startingLocation.Y)
-                    floatingDirection = -1;
+                else if (Position.Y + 15 >= startingLocation.Y)
+                    floatingDirection = -0.3f;
+
             }
 
             if (this.Position.Y < -300)

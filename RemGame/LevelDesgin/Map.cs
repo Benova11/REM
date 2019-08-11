@@ -201,7 +201,7 @@ namespace RemGame
 
                     else if (number == 11)//HealthBooster
                     {
-                        HealthBooster hb = new HealthBooster(world, content, player, 3, new Vector2(x * 64, y * 64),new Vector2(50,50));
+                        HealthBooster hb = new HealthBooster(world, content, player, 3, new Vector2(x * 64, y * 64),new Vector2(15,15));
                         hb.Position = new Vector2(x * size , y * size);
                         HealthBoostersList.Add(hb);
                     }

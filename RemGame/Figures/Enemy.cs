@@ -40,7 +40,8 @@ namespace RemGame
 
         protected int inspectionSightRange;
         protected float idleInterval;
-        protected float evasionLuck;
+
+        private bool playerInAttackRange = false;
 
         protected Vector2 position;
         protected Vector2 previousPosition;
@@ -71,7 +72,7 @@ namespace RemGame
             
             this.world = world;
             this.map = map;
-            this.player = player;
+            this.Player = player;
 
             this.startinghealth = health;
             this.Health = health;
@@ -91,11 +92,14 @@ namespace RemGame
         public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
         public Point GridLocation { get => gridLocation; set => gridLocation = value; }
         public virtual Vector2 Position { get => position; }
-        public bool IsPlayerAlive { get => player.IsAlive; }
+        public bool IsPlayerAlive { get => Player.IsAlive; }
         public int Startinghealth { get => startinghealth;}
         protected string Decision { get => decision; set => decision = value; }
         public Vector2[] PatrolGridPath { get => patrolGridPath; set => patrolGridPath = value; }
         public Vector2[] PlayerGridPath { get => playerGridPath; set => playerGridPath = value; }
+        public Random Luck { get; private set; }
+        public Kid Player { get => player; set => player = value; }
+        public bool PlayerInAttackRange { get => playerInAttackRange; set => playerInAttackRange = value; }
 
         public virtual void Update(GameTime gameTime, Vector2 playerPosition, bool PlayerAlive, int patrolbound)
         {
@@ -156,7 +160,7 @@ namespace RemGame
         {
             Vector2[] arr;
 
-            path = PathFinder.FindPath(gridLocation.ToVector2(), player.GridLocation.ToVector2(), "Manhattan");
+            path = PathFinder.FindPath(gridLocation.ToVector2(), Player.GridLocation.ToVector2(), "Manhattan");
             if (path == null)
                 arr = new Vector2[] { gridLocation.ToVector2() };
             else
@@ -182,7 +186,19 @@ namespace RemGame
 
         }
 
-        
+        public virtual bool isSpecialAbbilityLuck()
+        {
+            Luck = new Random();
+            float chance = Luck.Next(1000);
+            Console.WriteLine("luck:" + chance);
+            if (chance == 1)
+            {
+                return true;
+            }
+
+            else return false;
+        }
+
 
 
         /*

@@ -499,7 +499,7 @@ namespace RemGame
                 shot = new PhysicsObject(world, yoyoTexture, 15, 1);
                 shot.Body.CollisionCategories = Category.Cat28;
                 shot.Body.CollidesWith = Category.Cat20 | Category.Cat21 | Category.Cat1;
-                shot.Body.Mass = 2.0f;
+                shot.Body.Mass = 0.8f;
                 shot.Body.IgnoreGravity = true;
                 int shootingDirection;
 
@@ -515,7 +515,7 @@ namespace RemGame
 
                 }
                 
-                shot.Body.ApplyLinearImpulse(new Vector2(13 * shootingDirection, 0));
+                shot.Body.ApplyLinearImpulse(new Vector2(6 * shootingDirection, 0));
                 shot.Body.OnCollision += new OnCollisionEventHandler(Mele_OnCollision);
 
                 previousShoot = DateTime.Now;
@@ -557,7 +557,7 @@ namespace RemGame
 
                 //Console.WriteLine("end: " + currentMouseState.Position.X + " " + currentMouseState.Position.Y);
                 rangedShot.Position = new Vector2(upBody.Position.X , upBody.Position.Y-size.Y);
-                rangedShot.Body.Mass = 2.0f;
+                rangedShot.Body.Mass = 0.8f;
                 rangedShot.Body.ApplyForce(shootForce);
                 rangedShot.Body.OnCollision += new OnCollisionEventHandler(Shoot_OnCollision);
                 rangedShotList.Add(rangedShot);
@@ -578,8 +578,8 @@ namespace RemGame
 
             if (tmp != null)
             {
-                rangedShotList.Remove(tmp);
                 tmp.Body.Dispose();
+                rangedShotList.Remove(tmp);
             }
 
             return true;
@@ -888,7 +888,7 @@ namespace RemGame
                         shootBase = new Vector2(currentMouseState.Position.X, currentMouseState.Position.Y);
                         Vector2 shootForce = new Vector2((shootDirection.X - shootBase.X), (shootDirection.Y - shootBase.Y));
                         if (shootForce.X > 5 || shootForce.X < -5 || shootForce.Y > 5 || shootForce.Y < -5)
-                            rangedShoot(shootForce * 3);
+                            rangedShoot(shootForce);
 
                     }
 
@@ -1074,7 +1074,8 @@ namespace RemGame
 
                 foreach (PhysicsObject r in rangedShotList)
                 {
-                    r.Draw(gameTime, spriteBatch);
+                    if(!r.Body.IsDisposed)
+                        r.Draw(gameTime, spriteBatch);
                 }
 
                 //spriteBatch.DrawString(f, gridLocation.ToString(), new Vector2(Position.X + size.X, Position.Y+30), Color.White);
@@ -1105,9 +1106,6 @@ namespace RemGame
             midBody.Body.ResetDynamics();
             upBody.Body.ResetDynamics();
         }
-
-        
-
 
         public void setMap(Map map)
         {
