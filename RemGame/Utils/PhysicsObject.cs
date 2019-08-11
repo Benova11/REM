@@ -48,7 +48,19 @@ namespace RemGame
             );
             return destination;
         }
-        
+
+        public Rectangle physicsGroundedEnemyRectnagleObjRecToDraw()
+        {
+            Rectangle destination = new Rectangle
+            (
+                (int)Position.X - (int)radius * 2,
+                (int)Position.Y + (int)radius,
+                (int)(Size.X / 1.5f),
+                (int)(Size.Y / 1.5f)
+            );
+            return destination;
+        }
+
         public Rectangle physicsCircleObjRecToDraw()
         {
             Rectangle destination = new Rectangle
@@ -66,7 +78,7 @@ namespace RemGame
            if(this.Position.Y < 0)
             {
 
-                this.Body.Enabled = false; 
+                
                 
             }
         }

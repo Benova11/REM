@@ -56,7 +56,6 @@ namespace RemGame
 
 
         private bool playerDetected = false;
-        private bool playerInAttackRange = false;
         private bool isMeleAttacking = false;
 
         private RevoluteJoint axis1;
@@ -107,7 +106,8 @@ namespace RemGame
 
 
         Texture2D shootTexture;
-
+        private bool evadeRight;
+        private bool evadeLeft;
 
         public Principal(World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Vector2 startPosition, Point startLocationGrid, SpriteFont f, int inspectionSightRange, float idleInterval, float evasionLuck, int patrolRange, int newDistance, int playerDistanceToAttack):base(world,map,player,health,size,mass,speed,startLocationGrid,f)
         {
@@ -281,7 +281,7 @@ namespace RemGame
                 mele.Body.CollisionCategories = Category.Cat30;
                 mele.Body.CollidesWith = Category.Cat10 | Category.Cat11 | Category.Cat1;
 
-                mele.Body.Mass = 1.0f;
+                mele.Body.Mass = 0.4f;
                 mele.Body.IgnoreGravity = true;
                 mele.Position = new Vector2(torso.Position.X + torso.Size.X / 2, torso.Position.Y);
                 int dir;
@@ -391,7 +391,7 @@ namespace RemGame
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, SpriteFont font)
         {
-
+            
             if (patrolGridPath != null)
             {
                 Color c = Color.Red;
@@ -491,7 +491,7 @@ namespace RemGame
                 selectedPath = new Vector2[] { Vector2.Zero };
 
             //Borders for chcking path to the player,to reduce calculations
-            if ((player.GridLocation.X < GridLocation.X + 50 && player.GridLocation.X > GridLocation.X - 50) && (player.GridLocation.Y > 0) && player.GridLocation != null)
+            if ((Player.GridLocation.X < GridLocation.X + 50 && Player.GridLocation.X > GridLocation.X - 50) && (Player.GridLocation.Y > 0) && Player.GridLocation != null)
             {
                 playerGridPath = findPathToPlayer();
             }
@@ -503,13 +503,13 @@ namespace RemGame
             {
                 if ((playerGridPath.Length < 10 && playerGridPath.Length > 1))//sight range
                 {
-
+                    PlayerInAttackRange = true;
                     var trunk = MainDecisionTree();
                     decision = trunk.Evaluate(this);
                     Console.WriteLine(decision);
                     Console.WriteLine(Health);
 
-                    if (decision == "Attack") //attack range                
+                    if (decision == "Attack" || decision == "Freeze") //attack range                
                         mode = Mode.Attack;
 
                     else if (decision == "Evade") {
@@ -522,6 +522,11 @@ namespace RemGame
                             evaded = DateTime.Now;
 
                         }
+                        else
+                        {
+                            mode = Mode.Attack;
+
+                        }
                         //////////////////////////////////////////////////////////
                         //mode = Mode.Evade;
 
@@ -529,11 +534,13 @@ namespace RemGame
 
                     else if (mode != Mode.WalkToPlayer)
                         mode = Mode.WalkToPlayer;
-
+                    
                 }
 
                 else
                 {
+                    PlayerInAttackRange = false;
+
                     if (endOfPatrol)
                     {
                         if (mode != Mode.Idle)
@@ -614,36 +621,53 @@ namespace RemGame
                     break;
 
                 case Mode.Attack:
-                    if (player.Position.X > Position.X && !lookingRight)
+                    if (Player.Position.X > Position.X && !lookingRight)
                         Move(Movement.Right);
-                    else if (player.Position.X < Position.X && lookingRight)
+
+                    else if (Player.Position.X < Position.X && lookingRight)
                         Move(Movement.Left);
+
                     Move(Movement.Stop);
-                    if (IsPlayerAlive)
-                        //meleAttack();
-                    FreezePlayer();
 
-                    /*
-                    random = new Random();
-                    double randomInterval = (random.NextDouble() * 10 + 1);
-                    if (randomInterval < 4 && (DateTime.Now - evaded).TotalSeconds > 8)
-                    {
-                        mode = Mode.Evade;
-                        evaded = DateTime.Now;
+                    meleAttack();
 
-                    }
-                    */
+                    if (decision == "Freeze")
+                        FreezePlayer();
+
                     break;
 
                 case Mode.Evade:
 
                     dissapear = true;
 
-                    if (player.Position.X > Position.X - 200)
-                        Move(Movement.Right);
+                    if (!(evadeRight || evadeLeft))
+                    {
+                        if (Player.Position.X > Position.X)
+                            evadeRight = true;
+                        else if (Player.Position.X < Position.X)
+                            evadeLeft = true;
+                    }
 
-                    if (player.Position.X < Position.X + 200)
+                    if (evadeRight)
+                    {
+                        if (Position.X < Player.Position.X + 200)
+                            Move(Movement.Right);
+                        else
+                            evadeRight = false;
+                    }
+
+                    if (evadeLeft)
+                    {
+                        if (Position.X > Player.Position.X - 200)
+                            Move(Movement.Left);
+                        else
+                            evadeLeft = false;
+                    }
+                    /*
+
+                    else if (player.Position.X < Position.X + 200)
                         Move(Movement.Left);
+                        */
 
                     if ((DateTime.Now - evaded).TotalSeconds > 4)
                     {
@@ -724,7 +748,7 @@ namespace RemGame
         {
             Vector2[] arr;
 
-            path = PathFinder.FindPath(gridLocation.ToVector2(), player.GridLocation.ToVector2(), "Manhattan");
+            path = PathFinder.FindPath(gridLocation.ToVector2(), Player.GridLocation.ToVector2(), "Manhattan");
             if (path == null)
                 arr = new Vector2[] { gridLocation.ToVector2() };
             else
@@ -732,7 +756,7 @@ namespace RemGame
 
             return arr;
         }
-
+       
         private void swtichLookingDirection()
         {
             wheel.Body.ApplyLinearImpulse(new Vector2(0, -0.2f));
@@ -740,23 +764,37 @@ namespace RemGame
 
         private static Decision MainDecisionTree()
         {
-            //Decision 3
+            //Decision 4
             var evadeBranch = new DecisionQuery
             {
                 Title = "Evade",
-                Test = (en) => en.Health > 0,
+                Test = (en) => en.PlayerInAttackRange,
                 Positive = new DecisionResult { Result = true, Action = "Evade" },
                 Negative = new DecisionResult { Result = false }
             };
-
-
+            //Decision 3
+            var meleeBranch = new DecisionQuery
+            {
+                Title = "Attack",
+                Test = (en) => en.PlayerGridPath.Length < 6,
+                Positive = new DecisionResult { Result = true, Action = "Attack" },
+                Negative = new DecisionResult { Result = false }
+            };
+            //Decision 3
+            var SpecialAbillity = new DecisionQuery
+            {
+                Title = "Freeze",
+                Test = (en) => en.PlayerGridPath.Length < 8,
+                Positive = new DecisionResult { Result = true, Action = "Freeze" },
+                Negative = new DecisionResult { Result = false }
+            };
             //Decision 2
             var attackBranch = new DecisionQuery
             {
-                Title = "Attack",
-                Test = (en) => en.PlayerGridPath.Length < 7,
-                Positive = new DecisionResult { Result = true, Action = "Attack" },
-                Negative = new DecisionResult { Result = false }
+                Title = "Choose Attack Strg",
+                Test = (en) => en.isSpecialAbbilityLuck(),
+                Positive = SpecialAbillity,
+                Negative = meleeBranch
             };
 
             //Decision 1
@@ -790,14 +828,8 @@ namespace RemGame
         */
 
         private void FreezePlayer()
-        {
-            freezeLuck = new Random();
-            float chance = freezeLuck.Next(1000);
-            Console.WriteLine("luck:" + chance);
-            if (chance == 1)
-            {
-                player.freeze();
-            }
+        {          
+                Player.freeze();            
         }
     }
 }
