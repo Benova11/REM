@@ -81,7 +81,7 @@ namespace RemGame
 
 
         private DateTime previousJump = DateTime.Now;   // time at which we previously jumped
-        private const float jumpInterval = 0.7f;        // in seconds
+        private const float jumpInterval = 0.8f;        // in seconds
         private Vector2 jumpForce = new Vector2(0, -6); // applied force when jumping
 
         private DateTime previousSlide = DateTime.Now;   // time at which we previously jumped
@@ -211,7 +211,7 @@ namespace RemGame
       
         public void Jump()
         {
-            if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
+            if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval && !isInAir)
             {
                 isJumping = true;
                 if (direction == Movement.Right)
@@ -396,7 +396,7 @@ namespace RemGame
             }
 
             //dRAWS PATH TO PLAYER
-
+            
             if (PlayerGridPath != null)
             {
                 
@@ -426,14 +426,15 @@ namespace RemGame
                 mele.Draw(gameTime, spriteBatch);
 
             //wheel.Draw(gameTime,spriteBatch);
-
-            //spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
+            /*
+            spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
             if(selectedPath != null)
               spriteBatch.DrawString(font, selectedPath[selectedPath.Length - 1].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
             spriteBatch.DrawString(font, IsInAir.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64), Color.White);
 
             spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
+        */
         }
 
         public void UpdateAI()
@@ -545,7 +546,7 @@ namespace RemGame
 
                     if ((itrator == 0 && wandered && !isInAir) )
                     {
-                        Console.WriteLine("LOOKING FOR PATH");
+                        //Console.WriteLine("LOOKING FOR PATH");
                         PatrolGridPath = findPathToPatrol(patrolDirection * 20);
                         selectedPath = PatrolGridPath;
                         endOfPatrol = false;

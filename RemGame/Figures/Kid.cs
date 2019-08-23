@@ -288,13 +288,13 @@ namespace RemGame
             footstep = Content.Load<SoundEffect>("Sound/FX/Player/Ron_Footsteps");
             walkingInstance = footstep.CreateInstance();
             walkingInstance.IsLooped = true;
-            walkingInstance.Pitch = 0.18f;
+            walkingInstance.Pitch = 0.2f;
 
 
             jump_Up = Content.Load<SoundEffect>("Sound/FX/Player/Ron_Jump_Up");
             jumpingUpInstance = jump_Up.CreateInstance();
             jumpingUpInstance.IsLooped = false;
-            jumpingUpInstance.Volume = 0.02f;
+            jumpingUpInstance.Volume = 0.04f;
 
             jump_Down = Content.Load<SoundEffect>("Sound/FX/Player/Ron_Jump_Down");
             jumpingDownInstance = jump_Down.CreateInstance();
@@ -304,21 +304,21 @@ namespace RemGame
             idle = Content.Load<SoundEffect>("Sound/FX/Player/Ron_Idle");
             idleInstance = idle.CreateInstance();
             idleInstance.IsLooped = true;
-            idleInstance.Volume = 0.1f;
+            idleInstance.Volume = 0.35f;
             idleInstance.Pitch = 0.3f;
 
 
             crouch = Content.Load<SoundEffect>("Sound/FX/Player/Ron_Crouch");
             crouchingInstance = crouch.CreateInstance();
             crouchingInstance.IsLooped = true;
-            crouchingInstance.Volume = 0.03f;
+            crouchingInstance.Volume = 0.05f;
             crouchingInstance.Pitch = 0.25f;
 
 
             slide = Content.Load<SoundEffect>("Sound/FX/Player/Ron_Slide");
             slidingInstance = slide.CreateInstance();
             slidingInstance.IsLooped = false;
-            slidingInstance.Volume = 0.04f;
+            slidingInstance.Volume = 0.06f;
 
             Rectangle anim1 = new Rectangle(-135, -65, 200, 160);
             Rectangle anim2 = new Rectangle(-65, -65, 200, 160);
