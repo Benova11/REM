@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/level_01_A.jpg</SourceFile>
-  <SourceTime>2019-08-02T18:00:03.8625929+03:00</SourceTime>
-  <DestFile>C:/Users/ben11/source/repos/RemGame/LevelDesignerGui/Content/bin/Windows/Content/level_01_A.xnb</DestFile>
-  <DestTime>2019-08-02T18:01:51.5664988+03:00</DestTime>
+  <SourceFile>C:/Users/danie/source/repos/REM-dev/LevelDesignerGui/Content/level_01_A.jpg</SourceFile>
+  <SourceTime>2019-08-11T15:07:00+03:00</SourceTime>
+  <DestFile>C:/Users/danie/source/repos/REM-dev/LevelDesignerGui/Content/bin/Windows/Content/level_01_A.xnb</DestFile>
+  <DestTime>2019-08-20T13:40:38.9349761+03:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-12-08T18:35:54+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

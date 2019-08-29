@@ -11,19 +11,20 @@ using XELibrary;
 
 namespace RemGame
 {
-    
+
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         private GraphicsDeviceManager graphics;
 
 
         public SpriteBatch SpriteBatch { get; private set; }
-       
+
         CelAnimationManager celAnimationManager;
         ScrollingBackgroundManager scrollingBackgroundManager;
         InputHandler inputHandler;
         GameStateManager stateManager;
 
+        public ILoadLevelState LoadLevelState;
         public ITitleIntroState TitleIntroState;
         public IStartMenuState StartMenuState;
         public IPlayingState PlayingState;
@@ -58,6 +59,7 @@ namespace RemGame
             stateManager = new GameStateManager(this);
             Components.Add(stateManager);
 
+            LoadLevelState = new LoadLevelState(this);
             TitleIntroState = new TitleIntroState(this);
             StartMenuState = new StartMenuState(this);
             PausedState = new PausedState(this);
@@ -84,17 +86,17 @@ namespace RemGame
             EscapeState = new EscapeState(this);
             GameOverState = new GameOverState(this);
             MissionCompleteState = new MissionCompleteState(this);
+            LoadLevelState = new LoadLevelState(this);
         }
         protected override void Initialize()
         {
-            IsMouseVisible = true;
             base.Initialize();
         }
 
         protected override void BeginRun()
         {
             stateManager.ChangeState(StartMenuState.Value);
-            IsMouseVisible = true;
+            IsMouseVisible = false;
 
             base.Initialize();
             base.BeginRun();
@@ -103,7 +105,7 @@ namespace RemGame
         protected override void LoadContent()
         {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-           
+
         }
 
         protected override void Update(GameTime gameTime)

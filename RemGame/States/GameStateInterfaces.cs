@@ -11,6 +11,6 @@ namespace RemGame
     public interface IOptionsMenuState : IGameState { }
     public interface IGameOverState : IGameState { }
     public interface IMissionCompleteState : IGameState { }
-
+    public interface ILoadLevelState: IGameState { }
 
 }

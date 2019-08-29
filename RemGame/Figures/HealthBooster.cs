@@ -26,7 +26,9 @@ namespace RemGame
             this.player = player;
             this.world = world;
             Activated = false;
-            texture = Content.Load<Texture2D>("misc/HealthBooster");
+            if(AssetsDictionary.getDictionaryUsed())
+            texture = AssetsDictionary.getDictionary()["HealthBooster"];
+            else texture = Content.Load<Texture2D>("misc/HealthBooster");
             body = BodyFactory.CreateRectangle(world, size.X * CoordinateHelper.pixelToUnit, size.Y * CoordinateHelper.pixelToUnit, 1);
             body.BodyType = BodyType.Dynamic;
             body.IgnoreGravity = true;

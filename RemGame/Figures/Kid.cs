@@ -34,7 +34,7 @@ namespace RemGame
         RangedAttackLeft
     }
 
-    public enum playerMode { Idle, Walking, Attacking}// what mode of behavior the monster AI is using 
+    public enum playerMode { Idle, Walking, Attacking }// what mode of behavior the monster AI is using 
 
 
     class Kid : Component
@@ -505,41 +505,41 @@ namespace RemGame
 
                 if (lookRight)
                 {
-                    shot.Position = new Vector2(upBody.Position.X + upBody.Size.X*2, upBody.Position.Y + upBody.Size.Y /4);
+                    shot.Position = new Vector2(upBody.Position.X + upBody.Size.X * 2, upBody.Position.Y + upBody.Size.Y / 4);
                     shootingDirection = 1;
                 }
                 else
                 {
-                    shot.Position = new Vector2(upBody.Position.X, upBody.Position.Y + upBody.Size.Y/4);
+                    shot.Position = new Vector2(upBody.Position.X, upBody.Position.Y + upBody.Size.Y / 4);
                     shootingDirection = -1;
 
                 }
-                
+
                 shot.Body.ApplyLinearImpulse(new Vector2(6 * shootingDirection, 0));
                 shot.Body.OnCollision += new OnCollisionEventHandler(Mele_OnCollision);
 
                 previousShoot = DateTime.Now;
 
             }
-            
+
 
         }
 
         bool Mele_OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
         {
-          
-                PhysicsObject tmp = null;
-                
-                    if (shot.Body.BodyId == fixtureA.Body.BodyId)
-                        tmp = shot;
-                
 
-                if (tmp != null)
-                {
-                    
-                    tmp.Body.Dispose();
-                }
-            
+            PhysicsObject tmp = null;
+
+            if (shot.Body.BodyId == fixtureA.Body.BodyId)
+                tmp = shot;
+
+
+            if (tmp != null)
+            {
+
+                tmp.Body.Dispose();
+            }
+
             return true;
         }
 
@@ -556,7 +556,7 @@ namespace RemGame
                 rangedShot.Body.IgnoreCollisionWith(wheel.Body);
 
                 //Console.WriteLine("end: " + currentMouseState.Position.X + " " + currentMouseState.Position.Y);
-                rangedShot.Position = new Vector2(upBody.Position.X , upBody.Position.Y-size.Y);
+                rangedShot.Position = new Vector2(upBody.Position.X, upBody.Position.Y - size.Y);
                 rangedShot.Body.Mass = 0.8f;
                 rangedShot.Body.ApplyForce(shootForce);
                 rangedShot.Body.OnCollision += new OnCollisionEventHandler(Shoot_OnCollision);
@@ -639,7 +639,7 @@ namespace RemGame
                 if (HealthBar.getRectangle.Width <= 0)
                 {
                     IsAlive = false;
-                  
+
                 }
             }
 
@@ -648,7 +648,7 @@ namespace RemGame
 
         public override void Update(GameTime gameTime)
         {
-            
+
             walkingInstance.Volume = 0.1f;
             if ((DateTime.Now - previousFreeze).TotalSeconds > freezeInterval)
             {
@@ -974,10 +974,10 @@ namespace RemGame
                     r.Update(gameTime);
                 }
 
-              
+
                 if (isMeleAttacking)
                 {
-                    if(lookRight)
+                    if (lookRight)
                         anim = animations[(int)Animation.MeleeAttack];
                     else
                         anim = animations[(int)Animation.MeleeAttackLeft];
@@ -992,12 +992,12 @@ namespace RemGame
 
                 if (isRangeAttacking)
                 {
-                    if(lookRight)
+                    if (lookRight)
                         anim = animations[(int)Animation.RangedAttack];
                     else
                         anim = animations[(int)Animation.RangedAttackLeft];
 
-                    
+
                     if (anim.IsLooped)
                     {
 
@@ -1061,9 +1061,9 @@ namespace RemGame
                     }
                     else
                     {
-                        for (int i = 0; i < ropeLength/2; i++)
+                        for (int i = 0; i < ropeLength / 2; i++)
                         {
-                            spriteBatch.DrawString(f, "*", new Vector2(shot.Position.X + i  , shot.Position.Y + shot.Size.X * 4 + 15), Color.White);
+                            spriteBatch.DrawString(f, "*", new Vector2(shot.Position.X + i, shot.Position.Y + shot.Size.X * 4 + 15), Color.White);
 
                         }
                     }
@@ -1074,7 +1074,7 @@ namespace RemGame
 
                 foreach (PhysicsObject r in rangedShotList)
                 {
-                    if(!r.Body.IsDisposed)
+                    if (!r.Body.IsDisposed)
                         r.Draw(gameTime, spriteBatch);
                 }
 
@@ -1095,11 +1095,11 @@ namespace RemGame
             //debbuging
             //spriteBatch.DrawString(f, lookRight.ToString(), new Vector2(Position.X + size.X, Position.Y + 20), Color.White);
             //if (map != null)
-              //  spriteBatch.DrawString(f, "tile : " + map.getGridObject(gridLocation.X, gridLocation.Y + 3), new Vector2(Position.X + size.X, Position.Y + 40), Color.White);
+            //  spriteBatch.DrawString(f, "tile : " + map.getGridObject(gridLocation.X, gridLocation.Y + 3), new Vector2(Position.X + size.X, Position.Y + 40), Color.White);
 
 
         }
-        
+
         public void ResetPlayerDynamics()
         {
             wheel.Body.ResetDynamics();

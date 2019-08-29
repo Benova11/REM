@@ -17,6 +17,7 @@ namespace RemGame
         {
             "Tutorial",
             "Mission1",
+            "Load Level",
             "Options",
             "Exit Game"
         };
@@ -68,7 +69,7 @@ namespace RemGame
                             StateManager.PopState();
                         else // Starting a new game.
                             MediaPlayer.Stop();
-                            StateManager.ChangeState(OurGame.PlayingState.Value);
+                        StateManager.ChangeState(OurGame.PlayingState.Value);
 
                         break;
                     case 1:
@@ -77,15 +78,16 @@ namespace RemGame
                             StateManager.PopState();
                         else // Starting a new game.
                         {
-
                             StateManager.ChangeState(OurGame.Mission1.Value);
                         }
                         break;
-
                     case 2:
-                        StateManager.PushState(OurGame.OptionsMenuState.Value);
+                        StateManager.ChangeState(OurGame.LoadLevelState.Value);
                         break;
                     case 3:
+                        StateManager.PushState(OurGame.OptionsMenuState.Value);
+                        break;
+                    case 4:
                         StateManager.ChangeState(OurGame.TitleIntroState.Value);
                         break;
                 }

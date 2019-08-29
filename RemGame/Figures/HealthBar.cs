@@ -14,7 +14,9 @@ namespace RemGame
         
         public HealthBar(ContentManager Content)
         {
-            texture = Content.Load<Texture2D>("misc/HealthBar");
+            if(AssetsDictionary.getDictionaryUsed())
+                texture = AssetsDictionary.getDictionary()["HealthBar"];
+            else texture = Content.Load<Texture2D>("misc/HealthBar");
             rectangle = new Rectangle(0, 0, texture.Width*3, texture.Height);
         }
         

@@ -13,9 +13,9 @@ using Microsoft.Xna.Framework.Content;
 namespace RemGame
 {
 
-    
 
-    class Principal:Enemy
+
+    class Principal : Enemy
     {
 
         public enum Mode { Idle, Patrol, WalkToPlayer, Attack, Evade }// what mode of behavior the monster AI is using 
@@ -73,7 +73,7 @@ namespace RemGame
         private Mode previuosMode;
 
         private int patrolRange;
-   
+
         private int patrolDirection = 1;
 
         private DateTime previousWander = DateTime.Now;   // time at which we previously jumped
@@ -109,7 +109,7 @@ namespace RemGame
         private bool evadeRight;
         private bool evadeLeft;
 
-        public Principal(World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Vector2 startPosition, Point startLocationGrid, SpriteFont f, int inspectionSightRange, float idleInterval, float evasionLuck, int patrolRange, int newDistance, int playerDistanceToAttack):base(world,map,player,health,size,mass,speed,startLocationGrid,f)
+        public Principal(World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Vector2 startPosition, Point startLocationGrid, SpriteFont f, int inspectionSightRange, float idleInterval, float evasionLuck, int patrolRange, int newDistance, int playerDistanceToAttack) : base(world, map, player, health, size, mass, speed, startLocationGrid, f)
         {
             ////
             this.patrolRange = patrolRange;
@@ -121,25 +121,25 @@ namespace RemGame
             // Create the torso
             torso = new PhysicsObject(world, null, torsoSize.X, mass / 2.0f);
             torso.Position = startPosition;
-            
+
 
             int rInt = r.Next(192, 320);
             distance = rInt;
             oldDistance = distance;
-            
+
             ///////////////////////
             midBody = new PhysicsObject(world, null, torsoSize.X, mass / 2.0f);
             midBody.Position = torso.Position + new Vector2(0, size.Y);
             ///////////////////////
-            
+
 
             // Create the feet of the body
             wheel = new PhysicsObject(world, null, torsoSize.X, mass / 2.0f);
             wheel.Position = midBody.Position + new Vector2(0, size.Y);
-            
+
             ///////////////////////
             tail1 = new PhysicsObject(world, null, torsoSize.X, mass / 2.0f);
-            tail1.Position = midBody.Position + new Vector2(size.X*1.5f, size.Y);
+            tail1.Position = midBody.Position + new Vector2(size.X * 1.5f, size.Y);
 
 
             tail2 = new PhysicsObject(world, null, torsoSize.X, mass / 2.0f);
@@ -197,14 +197,28 @@ namespace RemGame
             pv4 = new PhysicsView(tail1.Body, tail1.Position, wheel.Size, f);
             pv5 = new PhysicsView(tail2.Body, tail2.Position, wheel.Size, f);
 
+            if (AssetsDictionary.getDictionaryUsed())
+            {
 
-            Animations[0] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Walk"), 2, 8, new Rectangle((int)-size.X/2, (int)(-size.Y*1.5), 250, 250), 0.05f);
-            Animations[1] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Walk"), 2, 8, new Rectangle((int)-size.X*2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
-            Animations[2] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Ranged_Chalk"), 4, 8, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
-            Animations[3] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Ranged_Chalk"), 4, 8, new Rectangle((int)-size.X/2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
-            Animations[4] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Stand"), 2, 17, new Rectangle((int)-size.X*2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
-            Animations[5] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Stand"), 2, 17, new Rectangle((int)-size.X/2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[0] = new AnimatedSprite(AssetsDictionary.getDictionary()["Principal_Walk"], 2, 8, new Rectangle((int)-size.X / 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[1] = new AnimatedSprite(AssetsDictionary.getDictionary()["Principal_Walk"], 2, 8, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[2] = new AnimatedSprite(AssetsDictionary.getDictionary()["Principal_Ranged_Chalk"], 4, 8, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[3] = new AnimatedSprite(AssetsDictionary.getDictionary()["Principal_Ranged_Chalk"], 4, 8, new Rectangle((int)-size.X / 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[4] = new AnimatedSprite(AssetsDictionary.getDictionary()["Principal_Stand"], 2, 17, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[5] = new AnimatedSprite(AssetsDictionary.getDictionary()["Principal_Stand"], 2, 17, new Rectangle((int)-size.X / 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                shootTexture = shootTexture = AssetsDictionary.getDictionary()["Chalk"];
+            }
+            else
+            {
+                Animations[0] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Walk"), 2, 8, new Rectangle((int)-size.X / 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[1] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Walk"), 2, 8, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[2] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Ranged_Chalk"), 4, 8, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[3] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Ranged_Chalk"), 4, 8, new Rectangle((int)-size.X / 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[4] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Stand"), 2, 17, new Rectangle((int)-size.X * 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                Animations[5] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Principal_Stand"), 2, 17, new Rectangle((int)-size.X / 2, (int)(-size.Y * 1.5), 250, 250), 0.05f);
+                shootTexture = shootTexture = Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Chalk");
 
+            }
 
             shootTexture = shootTexture = Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Chalk");
 
@@ -248,12 +262,10 @@ namespace RemGame
 
         /*
                 public void Jump()
-
                 {
                     if (motion == Act.jump) return;
                     motion = Act.jump;
                     wheel.Body.ApplyLinearImpulse(jumpForce * new Vector2(0, 1));
-
                     if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval)
                     {
                         torso.Body.ApplyLinearImpulse(jumpForce);
@@ -262,7 +274,7 @@ namespace RemGame
                 }
          */
         //should create variables for funciton
-   
+
         public void meleAttack()
         {
             random = new Random();
@@ -274,7 +286,7 @@ namespace RemGame
 
                 if (lookingRight && anim != Animations[2])
                     anim = Animations[2];
-                else if(anim != animations[3])
+                else if (anim != animations[3])
                     anim = animations[3];
 
                 mele = new PhysicsObject(world, shootTexture, 5, 1);
@@ -295,7 +307,7 @@ namespace RemGame
 
                 mele.Body.OnCollision += new OnCollisionEventHandler(Mele_OnCollision);
                 previousShoot = DateTime.Now;
-                
+
             }
             else
                 isAttacking = false;
@@ -364,7 +376,7 @@ namespace RemGame
                 if (!isMeleAttacking)
                     anim = Animations[(int)direction];
 
-                
+
 
                 UpdateAI();
 
@@ -391,7 +403,7 @@ namespace RemGame
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, SpriteFont font)
         {
-            
+
             if (patrolGridPath != null)
             {
                 Color c = Color.Red;
@@ -430,14 +442,14 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.Green);
                 }
-               */ 
+               */
             }
 
             //dRAWS PATH TO PLAYER
-            
+
             if (playerGridPath != null)
             {
-                
+
                 for (int i = 0; i < playerGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)playerGridPath[i].X * 64, (int)playerGridPath[i].Y * 64, 40, 40);
@@ -446,9 +458,9 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.GreenYellow);
                 }
-                
+
             }
-            
+
             //torso.Draw(gameTime,spriteBatch);
             Rectangle dest = torso.physicsRectnagleObjRecToDraw();
             //dest.Height = dest.Height+(int)wheel.Size.Y/2;
@@ -457,7 +469,7 @@ namespace RemGame
                 anim.Draw(spriteBatch, dest, torso.Body, true);
             if (!torso.Body.IsDisposed && anim != null && !lookingRight && !dissapear)
                 anim.Draw(spriteBatch, dest, torso.Body, false);
-            
+
 
 
             //pv1.Draw(gameTime, spriteBatch);
@@ -468,12 +480,12 @@ namespace RemGame
 
 
 
-            if (mele!=null && !(mele.Body.IsDisposed))
+            if (mele != null && !(mele.Body.IsDisposed))
                 mele.Draw(gameTime, spriteBatch);
 
             //wheel.Draw(gameTime,spriteBatch);
-            
-           //spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
+
+            //spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
             //if (selectedPath != null)
             //  spriteBatch.DrawString(font, selectedPath[selectedPath.Length - 1].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
 
@@ -512,7 +524,8 @@ namespace RemGame
                     if (decision == "Attack" || decision == "Freeze") //attack range                
                         mode = Mode.Attack;
 
-                    else if (decision == "Evade") {
+                    else if (decision == "Evade")
+                    {
                         //////maybe needs to be deleted and keep old evade////////////////
                         random = new Random();
                         double randomInterval = (random.NextDouble() * 10 + 1);
@@ -534,7 +547,7 @@ namespace RemGame
 
                     else if (mode != Mode.WalkToPlayer)
                         mode = Mode.WalkToPlayer;
-                    
+
                 }
 
                 else
@@ -664,7 +677,6 @@ namespace RemGame
                             evadeLeft = false;
                     }
                     /*
-
                     else if (player.Position.X < Position.X + 200)
                         Move(Movement.Left);
                         */
@@ -756,7 +768,7 @@ namespace RemGame
 
             return arr;
         }
-       
+
         private void swtichLookingDirection()
         {
             wheel.Body.ApplyLinearImpulse(new Vector2(0, -0.2f));
@@ -828,8 +840,8 @@ namespace RemGame
         */
 
         private void FreezePlayer()
-        {          
-                Player.freeze();            
+        {
+            Player.freeze();
         }
     }
 }

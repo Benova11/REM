@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Factories;
 using FarseerPhysics.Dynamics.Joints;
@@ -12,20 +10,15 @@ using Microsoft.Xna.Framework.Content;
 
 namespace RemGame
 {
-
     class groundedEnemy : Enemy
     {
         private int itrator = 0;
-
         private bool colorPicked = false;
         private bool isAlive = true;
         Random random;
-
         private int playerDistanceToAttack;
-
         private int distance;
         private int oldDistance;
-
         private PhysicsObject torso;
         private PhysicsObject wheel;
 
@@ -101,7 +94,7 @@ namespace RemGame
         Texture2D shootTexture;
         private bool isJumping;
 
-        public groundedEnemy (World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Vector2 startPosition, Point startLocationGrid, SpriteFont f, int inspectionSightRange, float idleInterval, float evasionLuck, int patrolRange, int newDistance, int playerDistanceToAttack) : base(world, map, player, health, size, mass, speed, startLocationGrid, f)
+        public groundedEnemy(World world, Map map, Kid player, int health, Vector2 size, float mass, float speed, Vector2 startPosition, Point startLocationGrid, SpriteFont f, int inspectionSightRange, float idleInterval, float evasionLuck, int patrolRange, int newDistance, int playerDistanceToAttack) : base(world, map, player, health, size, mass, speed, startLocationGrid, f)
         {
             ////
             this.patrolRange = patrolRange;
@@ -134,7 +127,7 @@ namespace RemGame
             // Create a joint to keep the torso upright
             JointFactory.CreateAngleJoint(world, torso.Body, new Body(world));
             JointFactory.CreateAngleJoint(world, midBody.Body, new Body(world));
-          
+
             axis1 = JointFactory.CreateRevoluteJoint(world, torso.Body, midBody.Body, Vector2.Zero);
             axis1.MotorEnabled = false;
 
@@ -149,7 +142,7 @@ namespace RemGame
             torso.Body.CollisionCategories = Category.Cat20;
             midBody.Body.CollisionCategories = Category.Cat20;
             wheel.Body.CollisionCategories = Category.Cat21;
-         
+
             torso.Body.CollidesWith = Category.Cat28 | Category.Cat7;
             wheel.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
             midBody.Body.CollidesWith = Category.Cat1 | Category.Cat28 | Category.Cat7;
@@ -166,7 +159,7 @@ namespace RemGame
 
 
             Animations[0] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Other/playerLeft"), 1, 4, new Rectangle((int)-size.X / 2, (int)(-size.Y / 2), 150, 200), 0.25f);
-            Animations[1] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Other/playerRight"), 1, 4, new Rectangle((int)-size.X / 2, (int)(-size.Y /2), 150, 200), 0.25f);
+            Animations[1] = new AnimatedSprite(Content.Load<Texture2D>("Figures/Other/playerRight"), 1, 4, new Rectangle((int)-size.X / 2, (int)(-size.Y / 2), 150, 200), 0.25f);
 
             shootTexture = shootTexture = Content.Load<Texture2D>("Figures/Level1/Principal/Anim/Chalk");
             isInAir = false;
@@ -182,7 +175,7 @@ namespace RemGame
 
 
         public void Move(Movement movement)
-        {       
+        {
             switch (movement)
             {
                 case Movement.Left:
@@ -208,7 +201,7 @@ namespace RemGame
                     break;
             }
         }
-      
+
         public void Jump()
         {
             if ((DateTime.Now - previousJump).TotalSeconds >= jumpInterval && !isInAir)
@@ -226,7 +219,7 @@ namespace RemGame
                 previousJump = DateTime.Now;
             }
         }
-         
+
         //should create variables for funciton
 
         public void meleAttack()
@@ -345,8 +338,8 @@ namespace RemGame
 
                 if (isMoving) // apply animation
                     Anim.Update(gameTime);
-                 else //player will appear as standing with frame [1] from the atlas.
-                   Anim.CurrentFrame = 1;
+                else //player will appear as standing with frame [1] from the atlas.
+                    Anim.CurrentFrame = 1;
 
             }
         }
@@ -383,7 +376,7 @@ namespace RemGame
                         x = 1;
                 }
                 //DRAWS A* PATH
-                
+
                 for (int i = 0; i < PatrolGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)PatrolGridPath[i].X * 64, (int)PatrolGridPath[i].Y * 64, 64, 64);
@@ -392,14 +385,14 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.Green);
                 }
-               
+
             }
 
             //dRAWS PATH TO PLAYER
-            
+
             if (PlayerGridPath != null)
             {
-                
+
                 for (int i = 0; i < playerGridPath.Length; i++)
                 {
                     Rectangle gridloc = new Rectangle((int)playerGridPath[i].X * 64, (int)playerGridPath[i].Y * 64, 40, 40);
@@ -408,7 +401,7 @@ namespace RemGame
                     else
                         spriteBatch.Draw(shootTexture, gridloc, Color.GreenYellow);
                 }
-                
+
             }
 
             //torso.Draw(gameTime,spriteBatch);
@@ -417,11 +410,11 @@ namespace RemGame
             //dest.Y = dest.Y + (int)wheel.Size.Y/2;
             if (!torso.Body.IsDisposed && anim != null && !dissapear)
                 anim.Draw(spriteBatch, dest, torso.Body, false);
-           
+
             //pv1.Draw(gameTime, spriteBatch);
             //pv2.Draw(gameTime, spriteBatch);
             //pv3.Draw(gameTime, spriteBatch);
-        
+
             if (mele != null && !(mele.Body.IsDisposed))
                 mele.Draw(gameTime, spriteBatch);
 
@@ -430,9 +423,7 @@ namespace RemGame
             spriteBatch.DrawString(font, this.GridLocation.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 - 20), Color.White);
             if(selectedPath != null)
               spriteBatch.DrawString(font, selectedPath[selectedPath.Length - 1].ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 20), Color.White);
-
             spriteBatch.DrawString(font, IsInAir.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64), Color.White);
-
             spriteBatch.DrawString(font, this.mode.ToString(), new Vector2(this.GridLocation.X * 64 + 90, this.GridLocation.Y * 64 + 40), Color.White);
         */
         }
@@ -450,7 +441,6 @@ namespace RemGame
                     }
                     else
                         wheel.Body.ApplyForce(new Vector2(-3, 0));
-
                 }
             }
             */
@@ -460,19 +450,19 @@ namespace RemGame
             //Borders for chcking path to the player,to reduce calculations
             if ((Player.GridLocation.X < GridLocation.X + 20 && Player.GridLocation.X > GridLocation.X - 20) && (Player.GridLocation.Y > 0) && Player.GridLocation != null && !isInAir)
             {
-               playerGridPath = findPathToPlayer();
+                playerGridPath = findPathToPlayer();
 
             }
 
             if (PlayerGridPath == null)
                 PlayerGridPath = new Vector2[] { gridLocation.ToVector2() };
-         
-                if ((PlayerGridPath.Length < 14 && PlayerGridPath.Length > 1))//sight range
-                {
+
+            if ((PlayerGridPath.Length < 14 && PlayerGridPath.Length > 1))//sight range
+            {
 
                 var trunk = MainDecisionTree();
                 decision = trunk.Evaluate(this);
-                
+
                 if (decision == "Attack") //attack range                
                     mode = Mode.Attack;
 
@@ -481,36 +471,36 @@ namespace RemGame
 
                 else if (mode != Mode.WalkToPlayer)
                     mode = Mode.WalkToPlayer;
-   
-                }
 
-                else
+            }
+
+            else
+            {
+                if (endOfPatrol)
                 {
-                    if (endOfPatrol)
-                    {
-                        if (mode != Mode.Idle)
-                            mode = Mode.Idle;
+                    if (mode != Mode.Idle)
+                        mode = Mode.Idle;
 
-                        if ((DateTime.Now - previousWander).TotalSeconds >= wanderInterval)
-                        {
-                            itrator = 0;
-                            endOfPatrol = false;
-                            wandered = true;
-                        }
-                    }
-
-                    else if (mode != Mode.Patrol)
+                    if ((DateTime.Now - previousWander).TotalSeconds >= wanderInterval)
                     {
-                        if (mode == Mode.WalkToPlayer)
-                            itrator = 0;
-                        mode = Mode.Patrol;
-                        
+                        itrator = 0;
+                        endOfPatrol = false;
+                        wandered = true;
                     }
+                }
+
+                else if (mode != Mode.Patrol)
+                {
+                    if (mode == Mode.WalkToPlayer)
+                        itrator = 0;
+                    mode = Mode.Patrol;
 
                 }
 
-                patrolDirection *= -1;
-            
+            }
+
+            patrolDirection *= -1;
+
             //condition needts to change by enemies abilities like attack up or down etc...           
             //if (playerGridPath.Length > 2)//if player not in range do: patrol idle,else do : attack,walktoplayer,evade
             //{            //}
@@ -544,7 +534,7 @@ namespace RemGame
                         */
                     }
 
-                    if ((itrator == 0 && wandered && !isInAir) )
+                    if ((itrator == 0 && wandered && !isInAir))
                     {
                         //Console.WriteLine("LOOKING FOR PATH");
                         PatrolGridPath = findPathToPatrol(patrolDirection * 20);
@@ -603,7 +593,6 @@ namespace RemGame
                     {
                         mode = Mode.Evade;
                         evaded = DateTime.Now;
-
                     }
                     */
                     break;
@@ -648,11 +637,11 @@ namespace RemGame
                     {
                         direction = Movement.Left;
                         Move(Movement.Left);
-                    }  
-         
-                        itrator++;
+                    }
+
+                    itrator++;
                 }
-                    previousPosition = Position;
+                previousPosition = Position;
             }
 
             else if (mode != Mode.Evade)
@@ -662,7 +651,7 @@ namespace RemGame
 
             }
         }
-  
+
         public Vector2[] findPathToPatrol(int dest)
         {
             int maxDestanationValue;
@@ -702,18 +691,18 @@ namespace RemGame
         {
             wheel.Body.ApplyLinearImpulse(new Vector2(0, -0.2f));
         }
-      	
+
         private static Decision MainDecisionTree()
-        {           
+        {
             //Decision 3
             var evadeBranch = new DecisionQuery
             {
                 Title = "Evade",
                 Test = (en) => en.Health > 0,
-                Positive = new DecisionResult { Result = true , Action = "Evade" },
+                Positive = new DecisionResult { Result = true, Action = "Evade" },
                 Negative = new DecisionResult { Result = false }
             };
-            
+
 
             //Decision 2
             var attackBranch = new DecisionQuery
@@ -728,7 +717,7 @@ namespace RemGame
             var HealthBranch = new DecisionQuery
             {
                 Title = "Have enough health",
-                Test = (en) => en.Health > en.Startinghealth/2,
+                Test = (en) => en.Health > en.Startinghealth / 2,
                 Positive = attackBranch,
                 Negative = evadeBranch
             };
