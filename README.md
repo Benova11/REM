@@ -3,6 +3,10 @@ Arcade-Platformer game(prototype) built with Monogame (former XNA).
 the game is part of collage final project.
 the game was develpoed by 2 programmers,animator sound engineer.
 
+![Alt text](RemGame/Content/ScreenDisplay/main_menu_Fixed.jpg?raw=true "Optional Title")
+
+
+
 the game mechanics includes some AI algorithems,grid mangment and physics.
 
 link to presentation (hebrew):
